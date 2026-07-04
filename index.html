@@ -615,7 +615,7 @@ td.tlink-cell{font-family:var(--font-body);font-weight:600;}
 // ============================================================
 //  CONFIG
 // ============================================================
-const API_URL = 'YOUR_APPS_SCRIPT_DEPLOYMENT_URL_HERE';
+const API_URL = 'https://script.google.com/macros/s/AKfycbwdTblOMz0gS7Jrr12Jjd4jZGnYq3hiqFTdwxDtLDfC4IbAEHNy4f_8ODclCfX0nCnp9w/exec';
 
 const STREAMS = [
   { key:'night1',   id:'_j6HDtjjJrk', label:'Opening Night',           games:['Game 1','Game 2','Game 3','Game 4','Game 5'],    start:new Date('2026-07-10T00:30Z'), end:new Date('2026-07-10T06:30Z') },
@@ -680,7 +680,7 @@ function navigateTeams(view) {
 //  FETCH
 // ============================================================
 async function fetchData() {
-  if (API_URL === 'YOUR_APPS_SCRIPT_DEPLOYMENT_URL_HERE') {
+  if (API_URL === 'https://script.google.com/macros/s/AKfycbwdTblOMz0gS7Jrr12Jjd4jZGnYq3hiqFTdwxDtLDfC4IbAEHNy4f_8ODclCfX0nCnp9w/exec') {
     document.getElementById('gameList').innerHTML = '<div class="setup-box"><strong>Setup Required</strong>Paste your Apps Script URL into <code>API_URL</code> near the top of the &lt;script&gt; section.</div>';
     return;
   }
