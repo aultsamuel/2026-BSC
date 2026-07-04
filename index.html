@@ -1,0 +1,1517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Backyard Classics Basketball</title>
+<style>
+
+/*
+  FONT PLACEHOLDER — replace when you have your files:
+  1. Create /fonts/ folder in GitHub repo, upload .woff2 / .ttf files
+  2. Add @font-face rules here
+  3. Update --font-display / --font-body variables below
+*/
+:root {
+  --font-display: 'Arial Black', Impact, 'Helvetica Neue', sans-serif;
+  --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+  --font-mono: 'SF Mono', 'Courier New', monospace;
+
+  /* ESPN/Netflix Light Theme */
+  --bg:         #f5f5f5;
+  --bg-white:   #ffffff;
+  --bg-nav:     #1a1a1a;
+  --bg-hero:    #111111;
+  --bg-raised:  #eeeeee;
+  --border:     #e0e0e0;
+  --shadow:     0 1px 4px rgba(0,0,0,.08);
+  --shadow-md:  0 4px 20px rgba(0,0,0,.12);
+
+  --accent:     #e05c2a;
+  --accent-dk:  #b83f12;
+  --red:        #cc0000;
+  --green:      #1a7a00;
+  --gold:       #b8860b;
+  --blue:       #0057b8;
+
+  --text:       #1a1a1a;
+  --text-dim:   #555555;
+  --text-muted: #888888;
+  --text-inv:   #ffffff;
+
+  --r:  8px;
+  --rs: 4px;
+  --nav-h: 54px;
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased;}
+a{color:var(--accent);text-decoration:none;}
+button{cursor:pointer;border:none;background:none;font-family:inherit;color:inherit;}
+img{display:block;max-width:100%;}
+
+/* ── NAV ── */
+nav{height:var(--nav-h);background:var(--bg-nav);display:flex;align-items:center;padding:0 16px;gap:4px;position:sticky;top:0;z-index:100;}
+.nav-logo{display:flex;align-items:center;gap:10px;margin-right:16px;flex-shrink:0;}
+.nav-logo img{height:34px;width:34px;border-radius:50%;object-fit:cover;}
+.nav-logo-ph{width:34px;height:34px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:12px;color:#fff;flex-shrink:0;}
+.nav-name{font-family:var(--font-display);font-size:14px;font-weight:900;text-transform:uppercase;letter-spacing:.05em;color:#fff;white-space:nowrap;}
+.nav-links{display:flex;align-items:center;gap:2px;overflow-x:auto;scrollbar-width:none;flex:1;}
+.nav-links::-webkit-scrollbar{display:none;}
+.nav-btn{padding:6px 12px;border-radius:var(--rs);font-size:13px;font-weight:600;color:rgba(255,255,255,.7);white-space:nowrap;transition:color .15s,background .15s;}
+.nav-btn:hover{color:#fff;background:rgba(255,255,255,.1);}
+.nav-btn.active{color:#fff;background:rgba(255,255,255,.15);}
+.nav-has-dd{position:relative;}
+.nav-dd{display:none;position:absolute;top:calc(100% + 4px);left:0;background:#fff;border:1px solid var(--border);border-radius:var(--r);min-width:170px;z-index:200;padding:4px 0;box-shadow:var(--shadow-md);}
+.nav-has-dd:hover .nav-dd,.nav-dd.open{display:block;}
+.nav-dd-item{display:flex;align-items:center;gap:8px;width:100%;padding:9px 14px;font-size:13px;font-weight:600;color:var(--text-dim);cursor:pointer;text-align:left;}
+.nav-dd-item:hover{background:var(--bg-raised);color:var(--text);}
+.nav-dd-item.all{border-bottom:1px solid var(--border);color:var(--accent);}
+.nav-dd-logo{width:20px;height:20px;border-radius:50%;background:var(--bg-raised);border:1px solid var(--border);object-fit:cover;flex-shrink:0;}
+.nav-dd-logo-ph{width:20px;height:20px;border-radius:50%;background:var(--bg-raised);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:var(--text-muted);flex-shrink:0;}
+.nav-right{margin-left:auto;flex-shrink:0;display:flex;align-items:center;gap:6px;font-size:11px;color:rgba(255,255,255,.4);padding-left:12px;}
+.rdot{width:6px;height:6px;border-radius:50%;background:#3fb950;}
+.rdot.stale{background:rgba(255,255,255,.3);}
+
+/* ── PAGES ── */
+.page{display:none;}
+.page.active{display:block;}
+.inner{max-width:1200px;margin:0 auto;padding:0 20px;}
+
+/* ── HERO ── */
+.hero{background:var(--bg-hero);color:#fff;}
+.hero-top{padding:20px 20px 0;max-width:1200px;margin:0 auto;}
+.hero-eyebrow{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:6px;}
+.hero-title{font-family:var(--font-display);font-size:clamp(18px,3vw,28px);font-weight:900;text-transform:uppercase;letter-spacing:.02em;color:#fff;margin-bottom:16px;}
+
+/* game navigator strip */
+.game-nav{display:flex;align-items:center;gap:8px;margin-bottom:14px;}
+.gnav-arrow{width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.12);color:#fff;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;transition:background .15s;}
+.gnav-arrow:hover{background:rgba(255,255,255,.25);}
+.gnav-track{flex:1;overflow:hidden;position:relative;}
+.gnav-slides{display:flex;transition:transform .35s ease;}
+.gnav-chip{min-width:100%;display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:var(--r);padding:10px 14px;}
+.gnav-chip-logo{width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;}
+.gnav-chip-logo img{width:30px;height:30px;border-radius:50%;object-fit:cover;}
+.gnav-vs{font-size:11px;color:rgba(255,255,255,.4);flex-shrink:0;}
+.gnav-info{flex:1;min-width:0;}
+.gnav-teams{font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.gnav-meta{font-size:11px;color:rgba(255,255,255,.5);margin-top:1px;}
+.gnav-watch{flex-shrink:0;}
+.gnav-dots{display:flex;gap:5px;justify-content:center;margin-top:8px;padding-bottom:12px;}
+.gnav-dot{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.25);transition:background .2s;}
+.gnav-dot.active{background:#fff;}
+.gnav-empty{padding:14px 20px;color:rgba(255,255,255,.4);font-size:13px;text-align:center;}
+
+/* stream embed */
+.stream-embed-outer{position:relative;padding-top:min(56.25%, 54vh);background:#000;}
+.stream-embed-outer iframe{position:absolute;inset:0;width:100%;height:100%;border:none;}
+
+/* ── BROWSE SECTION ── */
+.browse-section{background:var(--bg-white);border-bottom:1px solid var(--border);}
+.browse-inner{max-width:1200px;margin:0 auto;padding:20px 20px;}
+.browse-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.browse-title{font-family:var(--font-display);font-size:16px;font-weight:900;text-transform:uppercase;letter-spacing:.04em;}
+.browse-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;}
+.btab{padding:6px 14px;border-radius:999px;font-size:12px;font-weight:700;border:1.5px solid var(--border);color:var(--text-muted);transition:all .15s;}
+.btab.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+.btab:hover:not(.active){border-color:var(--text-dim);color:var(--text);}
+
+/* Netflix tiles */
+.tiles-scroll{display:flex;gap:14px;overflow-x:auto;padding-bottom:16px;scrollbar-width:thin;scroll-snap-type:x mandatory;}
+.tiles-scroll::-webkit-scrollbar{height:4px;}
+.tiles-scroll::-webkit-scrollbar-track{background:var(--border);}
+.tiles-scroll::-webkit-scrollbar-thumb{background:var(--text-muted);border-radius:99px;}
+.tile{flex:0 0 260px;background:var(--bg-white);border:1.5px solid var(--border);border-radius:var(--r);padding:16px;scroll-snap-align:start;transition:border-color .15s,box-shadow .15s;display:flex;flex-direction:column;gap:12px;}
+.tile:hover{border-color:var(--accent);box-shadow:var(--shadow-md);}
+.tile-header{display:flex;justify-content:space-between;align-items:center;}
+.tile-type{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);}
+.tile-datetime{font-size:11px;color:var(--text-muted);}
+.tile-matchup{display:flex;align-items:center;justify-content:space-between;gap:8px;}
+.tile-team{display:flex;flex-direction:column;align-items:center;gap:6px;flex:1;}
+.tile-logo{width:48px;height:48px;border-radius:50%;background:var(--bg-raised);border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:13px;font-weight:900;color:var(--text-muted);}
+.tile-logo img{width:48px;height:48px;border-radius:50%;object-fit:cover;}
+.tile-team-name{font-weight:700;font-size:13px;text-align:center;cursor:pointer;}
+.tile-team-name:hover{color:var(--accent);}
+.tile-team-record{font-size:11px;color:var(--text-muted);}
+.tile-vs{font-size:11px;color:var(--text-muted);}
+.tile-score{font-family:var(--font-display);font-size:22px;font-weight:900;color:var(--text);display:flex;gap:4px;align-items:center;}
+.tile-score .sep{color:var(--text-muted);font-size:14px;}
+.tile-status{font-size:11px;text-align:center;font-weight:600;}
+.tile-status.final{color:var(--green);}
+.tile-status.upcoming{color:var(--text-muted);}
+.tile-actions{display:flex;gap:8px;}
+.tile-empty{padding:40px;text-align:center;color:var(--text-muted);font-size:13px;flex:0 0 100%;border:1.5px dashed var(--border);border-radius:var(--r);}
+
+/* ── HOME LOWER ── */
+.home-lower{max-width:1200px;margin:0 auto;padding:24px 20px 60px;display:grid;grid-template-columns:1fr 360px;gap:24px;}
+@media(max-width:900px){.home-lower{grid-template-columns:1fr;}}
+
+/* home standings */
+.home-standings-card{background:var(--bg-white);border:1.5px solid var(--border);border-radius:var(--r);overflow:hidden;}
+.card-head{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--border);}
+.card-head-title{font-family:var(--font-display);font-size:13px;font-weight:900;text-transform:uppercase;letter-spacing:.06em;color:var(--text);}
+.card-head-link{font-size:12px;font-weight:700;color:var(--accent);}
+.card-head-link:hover{text-decoration:underline;}
+.standings-tbl{width:100%;}
+.standings-tbl th{font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--text-muted);padding:8px 12px;text-align:left;background:var(--bg-raised);border-bottom:1px solid var(--border);}
+.standings-tbl td{padding:10px 12px;border-bottom:1px solid var(--border);font-size:14px;}
+.standings-tbl tr:last-child td{border-bottom:none;}
+.standings-tbl .mono{font-family:var(--font-mono);}
+.standings-team-cell{display:flex;align-items:center;gap:8px;}
+.standings-logo{width:28px;height:28px;border-radius:50%;background:var(--bg-raised);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:var(--text-muted);flex-shrink:0;}
+.standings-logo img{width:28px;height:28px;border-radius:50%;object-fit:cover;}
+.tlink{cursor:pointer;font-weight:700;}
+.tlink:hover{color:var(--accent);text-decoration:underline;}
+
+/* home performances */
+.perf-card{background:var(--bg-white);border:1.5px solid var(--border);border-radius:var(--r);overflow:hidden;}
+.carousel-track{overflow:hidden;}
+.carousel-slides{display:flex;transition:transform .5s ease;}
+.carousel-slide{min-width:100%;padding:20px;display:flex;align-items:center;gap:16px;}
+.c-val{font-family:var(--font-display);font-size:48px;font-weight:900;color:var(--accent);line-height:1;flex-shrink:0;width:80px;text-align:center;}
+.c-cat{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text-muted);margin-bottom:3px;}
+.c-player{font-family:var(--font-display);font-size:20px;font-weight:900;text-transform:uppercase;cursor:pointer;}
+.c-player:hover{color:var(--accent);}
+.c-detail{font-size:12px;color:var(--text-dim);margin-top:2px;}
+.c-phase{display:inline-block;padding:2px 7px;border-radius:999px;font-size:10px;font-weight:700;letter-spacing:.06em;margin-top:5px;background:var(--bg-raised);color:var(--text-muted);border:1px solid var(--border);}
+.c-rank{font-size:10px;font-weight:700;color:var(--text-muted);margin-top:3px;}
+.carousel-dots{display:flex;justify-content:center;gap:5px;padding:10px;border-top:1px solid var(--border);}
+.cdot{width:6px;height:6px;border-radius:50%;background:var(--border);}
+.cdot.active{background:var(--accent);}
+
+/* ── SHARED ── */
+.page-inner{max-width:1200px;margin:0 auto;padding:24px 20px 80px;}
+.sect-title{font-family:var(--font-display);font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.1em;color:var(--text-muted);margin-bottom:12px;}
+.card{background:var(--bg-white);border:1.5px solid var(--border);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow);}
+table{width:100%;border-collapse:collapse;}
+th{text-align:left;font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--text-muted);padding:10px 12px;border-bottom:1px solid var(--border);white-space:nowrap;cursor:pointer;user-select:none;background:var(--bg-raised);}
+th:hover{color:var(--text-dim);}
+th.sorted{color:var(--accent);}
+td{padding:10px 12px;border-bottom:1px solid var(--border);font-family:var(--font-mono);font-size:13px;white-space:nowrap;}
+td.name{font-family:var(--font-body);font-weight:600;white-space:normal;}
+tr:last-child td{border-bottom:none;}
+.scroll-x{overflow-x:auto;}
+.badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:700;}
+.badge-final{background:rgba(26,122,0,.1);color:var(--green);border:1px solid rgba(26,122,0,.25);}
+.badge-ot{background:rgba(184,134,11,.1);color:var(--gold);border:1px solid rgba(184,134,11,.25);}
+.badge-up{background:var(--bg-raised);color:var(--text-muted);border:1px solid var(--border);}
+.badge-live{background:rgba(204,0,0,.1);color:var(--red);border:1px solid rgba(204,0,0,.3);animation:pblink 1.8s infinite;}
+@keyframes pblink{50%{opacity:.6;}}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:6px 14px;border-radius:var(--rs);font-size:12px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;transition:opacity .15s;}
+.btn:hover{opacity:.85;}
+.btn-watch{background:var(--red);color:#fff;}
+.btn-accent{background:var(--accent);color:#fff;}
+.btn-outline{border:1.5px solid var(--border);color:var(--text-dim);}
+.btn-outline:hover{border-color:var(--text-dim);color:var(--text);}
+.btn-ghost{color:var(--text-dim);padding:5px 10px;border-radius:var(--rs);}
+.btn-ghost:hover{background:var(--bg-raised);color:var(--text);}
+.btn-sm{padding:4px 10px;font-size:11px;}
+.filter-row{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap;}
+.fbtn{padding:6px 16px;border-radius:999px;font-size:12px;font-weight:700;border:1.5px solid var(--border);color:var(--text-muted);transition:all .15s;}
+.fbtn.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+.fbtn:hover:not(.active){border-color:var(--text-dim);color:var(--text);}
+.subnav{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap;}
+.snbtn{padding:6px 16px;border-radius:999px;font-size:12px;font-weight:700;border:1.5px solid var(--border);color:var(--text-muted);transition:all .15s;}
+.snbtn.active{background:var(--bg-raised);border-color:var(--accent);color:var(--accent);}
+.snbtn:hover:not(.active){border-color:var(--text-dim);color:var(--text);}
+.empty{padding:40px;text-align:center;color:var(--text-muted);}
+.loading{padding:40px;text-align:center;color:var(--text-muted);}
+.loading::after{content:'';display:inline-block;width:18px;height:18px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;vertical-align:middle;margin-left:10px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.err-box{background:rgba(204,0,0,.06);border:1px solid rgba(204,0,0,.2);border-radius:var(--r);padding:14px 18px;font-size:13px;color:var(--red);line-height:1.6;}
+.err-box strong{display:block;margin-bottom:4px;}
+.setup-box{background:rgba(0,87,184,.06);border:1px solid rgba(0,87,184,.2);border-radius:var(--r);padding:14px 18px;font-size:13px;color:var(--blue);}
+.setup-box strong{display:block;margin-bottom:4px;}
+
+/* ── SCHEDULE (Yahoo Sports style) ── */
+.game-list{display:flex;flex-direction:column;gap:10px;}
+.yahoo-game{background:var(--bg-white);border:1.5px solid var(--border);border-radius:var(--r);padding:14px 16px;box-shadow:var(--shadow);}
+.yg-top{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+.yg-type{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;padding:2px 8px;border-radius:999px;background:var(--bg-raised);color:var(--text-muted);border:1px solid var(--border);}
+.yg-date{font-size:12px;color:var(--text-muted);}
+.yg-body{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.yg-team{flex:1;min-width:120px;}
+.yg-team-row{display:flex;align-items:center;gap:8px;margin-bottom:4px;}
+.yg-logo{width:32px;height:32px;border-radius:50%;background:var(--bg-raised);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--text-muted);flex-shrink:0;}
+.yg-logo img{width:32px;height:32px;border-radius:50%;object-fit:cover;}
+.yg-team-name{font-weight:700;font-size:15px;}
+.yg-team-name.winner{color:var(--text);}
+.yg-team-name.loser{color:var(--text-muted);}
+.yg-record{font-size:11px;color:var(--text-muted);margin-left:40px;}
+.yg-leader{font-size:11px;color:var(--text-dim);margin-left:40px;margin-top:2px;}
+.yg-leader .lname{font-weight:600;cursor:pointer;}
+.yg-leader .lname:hover{color:var(--accent);}
+.yg-center{flex:0 0 100px;text-align:center;flex-shrink:0;}
+.yg-score{font-family:var(--font-display);font-size:26px;font-weight:900;display:flex;justify-content:center;gap:6px;align-items:center;}
+.yg-score .sep{color:var(--text-muted);font-size:16px;}
+.yg-time{font-size:14px;font-weight:700;color:var(--text);}
+.yg-status{font-size:11px;color:var(--text-muted);margin-top:4px;}
+.yg-actions{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;}
+
+/* box score panel */
+.box-panel{border-top:1px solid var(--border);max-height:0;overflow:hidden;transition:max-height .3s ease;}
+.box-panel.open{max-height:1200px;}
+.box-inner{padding:14px 16px;}
+.box-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+@media(max-width:660px){.box-grid{grid-template-columns:1fr;}}
+.box-team-lbl{font-family:var(--font-display);font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:var(--text-dim);margin-bottom:8px;}
+.box-tbl th,.box-tbl td{padding:6px 8px;font-size:12px;}
+.box-tbl td.name{font-size:12px;max-width:130px;}
+.box-tot td{font-weight:700;border-top:2px solid var(--accent)!important;}
+
+/* ── STATS ── */
+.stats-note{font-size:12px;color:var(--text-muted);margin-bottom:12px;}
+
+/* ── STANDINGS (full page) ── */
+td.tlink-cell{font-family:var(--font-body);font-weight:600;}
+.tb-box{margin-top:24px;background:var(--bg-white);border:1.5px solid var(--border);border-radius:var(--r);padding:20px 22px;}
+.tb-box h3{font-family:var(--font-display);font-size:13px;font-weight:900;text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px;color:var(--text-dim);}
+.tb-box ol{padding-left:18px;display:flex;flex-direction:column;gap:8px;}
+.tb-box li{font-size:13px;color:var(--text-dim);line-height:1.5;}
+.tb-box li strong{color:var(--text);}
+
+/* ── TEAMS ── */
+.team-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;}
+.team-card{background:var(--bg-white);border:1.5px solid var(--border);border-radius:var(--r);padding:20px;cursor:pointer;transition:border-color .15s,box-shadow .15s;display:flex;flex-direction:column;gap:12px;box-shadow:var(--shadow);}
+.team-card:hover{border-color:var(--accent);box-shadow:var(--shadow-md);}
+.team-card-head{display:flex;align-items:center;gap:14px;}
+.tc-logo{width:60px;height:60px;border-radius:50%;background:var(--bg-raised);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:16px;font-weight:900;color:var(--text-muted);flex-shrink:0;}
+.tc-logo img{width:60px;height:60px;border-radius:50%;object-fit:cover;}
+.tc-name{font-family:var(--font-display);font-size:20px;font-weight:900;text-transform:uppercase;}
+.tc-record{font-family:var(--font-mono);font-size:13px;color:var(--text-dim);}
+.tc-cap{font-size:12px;color:var(--text-dim);}
+.tc-cap span{color:var(--gold);font-weight:700;}
+
+/* team detail */
+.td-hdr{display:flex;align-items:center;gap:20px;margin-bottom:28px;flex-wrap:wrap;}
+.td-logo{width:80px;height:80px;border-radius:50%;background:var(--bg-raised);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:22px;font-weight:900;flex-shrink:0;}
+.td-logo img{width:80px;height:80px;border-radius:50%;object-fit:cover;}
+.td-name{font-family:var(--font-display);font-size:clamp(24px,5vw,40px);font-weight:900;text-transform:uppercase;letter-spacing:.02em;}
+.td-meta{display:flex;gap:20px;margin-top:6px;flex-wrap:wrap;}
+.td-stat-val{font-family:var(--font-display);font-size:26px;font-weight:900;color:var(--accent);line-height:1;}
+.td-stat-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);margin-top:2px;}
+.roster-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-bottom:28px;}
+.roster-card{background:var(--bg-white);border:1.5px solid var(--border);border-radius:var(--rs);padding:10px 14px;box-shadow:var(--shadow);}
+.roster-name{font-weight:700;font-size:14px;}
+.role-cap{font-size:11px;color:var(--gold);font-weight:700;margin-top:2px;}
+.role-r1{font-size:11px;color:var(--accent);margin-top:2px;}
+.role-core{font-size:11px;color:var(--text-muted);margin-top:2px;}
+.role-sub{font-size:11px;color:var(--blue);margin-top:2px;}
+.tot-row td{font-weight:700;border-top:2px solid var(--accent)!important;}
+
+/* ── BRACKET ── */
+.bracket-hdr{background:var(--bg-hero);color:#fff;padding:28px 20px;text-align:center;}
+.bracket-hdr-title{font-family:var(--font-display);font-size:clamp(28px,5vw,52px);font-weight:900;letter-spacing:.04em;text-transform:uppercase;}
+.bracket-hdr-sub{font-size:14px;color:rgba(255,255,255,.5);margin-top:4px;letter-spacing:.06em;text-transform:uppercase;}
+.bracket-champ-banner{background:linear-gradient(135deg,#7a4800,#d29922);padding:24px 20px;text-align:center;}
+.champ-trophy{font-size:36px;}
+.champ-name{font-family:var(--font-display);font-size:clamp(22px,4vw,40px);font-weight:900;color:#fff;text-transform:uppercase;margin-top:4px;}
+.champ-sub{font-size:14px;color:rgba(255,255,255,.7);letter-spacing:.08em;text-transform:uppercase;margin-top:2px;}
+.bracket-wrap{overflow-x:auto;padding:24px 20px;}
+.bracket-layout{display:flex;gap:0;min-width:840px;}
+.bc{display:flex;flex-direction:column;flex:1;padding:0 8px;}
+.bc-hdr{text-align:center;font-family:var(--font-display);font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);padding:8px 0;border-bottom:2px solid var(--border);margin-bottom:14px;}
+.b-round{display:flex;flex-direction:column;justify-content:space-around;flex:1;gap:14px;}
+.b-match{background:var(--bg-white);border:1.5px solid var(--border);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow);}
+.b-match.upcoming{border-style:dashed;opacity:.7;}
+.b-match-time{text-align:center;font-size:10px;color:var(--text-muted);padding:5px;background:var(--bg-raised);border-bottom:1px solid var(--border);letter-spacing:.04em;font-weight:600;}
+.b-team{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 11px;border-bottom:1px solid var(--border);}
+.b-team:last-child{border-bottom:none;}
+.b-team.winner{background:rgba(26,122,0,.05);}
+.b-team-info{display:flex;align-items:center;gap:6px;}
+.b-logo{width:24px;height:24px;border-radius:50%;background:var(--bg-raised);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;flex-shrink:0;}
+.b-logo img{width:24px;height:24px;border-radius:50%;object-fit:cover;}
+.b-seed{font-size:10px;color:var(--text-muted);font-weight:700;background:var(--bg-raised);padding:1px 4px;border-radius:3px;}
+.b-name{font-weight:700;font-size:13px;}
+.b-score{font-family:var(--font-display);font-size:16px;font-weight:900;color:var(--accent);min-width:24px;text-align:right;}
+.b-tbd{font-size:12px;color:var(--text-muted);font-style:italic;}
+.b-match-foot{display:flex;gap:6px;padding:6px 10px;border-top:1px solid var(--border);background:var(--bg-raised);}
+.champ-slot{display:flex;flex-direction:column;justify-content:center;flex:1;padding:6px 0;}
+.champ-card-inner{background:linear-gradient(135deg,#7a4800,var(--gold));border-radius:var(--r);padding:24px 14px;text-align:center;box-shadow:var(--shadow-md);}
+.cc-trophy{font-size:28px;}
+.cc-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.7);}
+.cc-name{font-family:var(--font-display);font-size:17px;font-weight:900;color:#fff;margin-top:4px;cursor:pointer;}
+.cc-name:hover{text-decoration:underline;}
+.cc-logo{width:60px;height:60px;border-radius:50%;border:3px solid rgba(255,255,255,.5);margin:8px auto 0;}
+.cc-year{font-size:11px;color:rgba(255,255,255,.7);margin-top:4px;letter-spacing:.06em;}
+
+/* ── HIGHS ── */
+.highs-phase-tabs{display:flex;gap:8px;margin-bottom:14px;}
+.hptab{padding:6px 18px;border-radius:999px;font-size:12px;font-weight:700;border:1.5px solid var(--border);color:var(--text-muted);transition:all .15s;}
+.hptab.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+.hptab:hover:not(.active){border-color:var(--text-dim);color:var(--text);}
+.highs-cat-sel{background:var(--bg-white);border:1.5px solid var(--border);color:var(--text);padding:8px 12px;border-radius:var(--rs);font-size:13px;width:100%;max-width:300px;margin-bottom:16px;}
+.highs-list{display:flex;flex-direction:column;gap:6px;}
+.h-row{display:flex;align-items:center;gap:12px;background:var(--bg-white);border:1.5px solid var(--border);border-radius:var(--rs);padding:10px 14px;box-shadow:var(--shadow);}
+.h-row.r1{border-color:var(--gold);background:rgba(184,134,11,.04);}
+.h-rank{font-family:var(--font-display);font-size:18px;font-weight:900;width:26px;text-align:center;color:var(--text-muted);flex-shrink:0;}
+.h-rank.gold{color:var(--gold);}
+.h-val{font-family:var(--font-display);font-size:28px;font-weight:900;color:var(--accent);min-width:52px;text-align:right;flex-shrink:0;}
+.h-info{flex:1;}
+.h-player{font-weight:700;font-size:14px;}
+.h-meta{font-size:12px;color:var(--text-dim);}
+
+/* ── ABOUT ── */
+.about-section{background:var(--bg-white);border:1.5px solid var(--border);border-radius:var(--r);padding:28px 32px;margin-bottom:20px;box-shadow:var(--shadow);}
+.about-section h2{font-family:var(--font-display);font-size:22px;text-transform:uppercase;margin-bottom:14px;}
+.about-section p{margin-bottom:12px;font-size:14px;line-height:1.7;color:var(--text-dim);}
+.about-section ul,.about-section ol{padding-left:20px;margin-bottom:12px;}
+.about-section li{font-size:14px;line-height:1.7;color:var(--text-dim);margin-bottom:4px;}
+.about-section h3{font-size:15px;font-weight:700;margin-top:16px;margin-bottom:8px;}
+
+/* ── BLOG / FORM PH ── */
+.placeholder-card{background:var(--bg-white);border:1.5px solid var(--border);border-radius:var(--r);padding:40px;text-align:center;box-shadow:var(--shadow);}
+.placeholder-card h3{font-size:18px;font-weight:700;margin-bottom:8px;}
+.placeholder-card p{color:var(--text-muted);font-size:13px;}
+.form-ph{background:var(--bg-white);border:1.5px dashed var(--border);border-radius:var(--r);padding:40px;text-align:center;box-shadow:var(--shadow);}
+.form-ph h3{font-size:16px;font-weight:700;margin-bottom:8px;}
+.form-ph p{color:var(--text-dim);font-size:13px;}
+.form-ph code{display:block;margin-top:14px;padding:10px 14px;background:var(--bg-raised);border-radius:var(--rs);font-family:var(--font-mono);font-size:12px;color:var(--accent);text-align:left;border:1px solid var(--border);}
+.form-embed{border:none;width:100%;min-height:760px;border-radius:var(--r);}
+
+@media(max-width:600px){
+  .page-inner,.browse-inner,.hero-top{padding:14px 12px;}
+  .home-lower{padding:16px 12px 60px;}
+  .yg-body{flex-direction:column;align-items:stretch;}
+  .yg-center{border-top:1px solid var(--border);padding-top:10px;margin-top:4px;}
+  .bracket-wrap{padding:14px 12px;}
+}
+
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">
+    <!-- Swap div for <img src="logos/league.png" alt="BSC"> when logo is ready -->
+    <div class="nav-logo-ph">BSC</div>
+    <span class="nav-name">Backyard Classics</span>
+  </div>
+  <div class="nav-links">
+    <button class="nav-btn active" data-page="home">Home</button>
+    <button class="nav-btn" data-page="schedule">Schedule</button>
+    <button class="nav-btn" data-page="stats">Stats</button>
+    <button class="nav-btn" data-page="standings">Standings</button>
+    <div class="nav-has-dd">
+      <button class="nav-btn" data-page="teams" id="teamsNavBtn">Teams ▾</button>
+      <div class="nav-dd" id="teamDropdown">
+        <button class="nav-dd-item all" onclick="navigateTeams('home')">All Teams</button>
+        <!-- Populated by JS -->
+      </div>
+    </div>
+    <button class="nav-btn" data-page="bracket">Bracket</button>
+    <button class="nav-btn" data-page="highs">Highs</button>
+    <button class="nav-btn" data-page="blog">Blog</button>
+    <button class="nav-btn" data-page="about">About</button>
+    <button class="nav-btn" data-page="interest">Play With Us</button>
+  </div>
+  <div class="nav-right">
+    <div class="rdot stale" id="rdot"></div>
+    <span id="rtime">–</span>
+  </div>
+</nav>
+
+<!-- ══ HOME ══ -->
+<div class="page active" id="page-home">
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-top">
+      <div class="hero-eyebrow">2026 Backyard Summer Classic</div>
+      <div class="hero-title">Watch the 2026 Backyard Summer Classic</div>
+      <!-- Mini game navigator -->
+      <div class="game-nav" id="gameNav">
+        <button class="gnav-arrow" id="gnavPrev">‹</button>
+        <div class="gnav-track"><div class="gnav-slides" id="gnavSlides"></div></div>
+        <button class="gnav-arrow" id="gnavNext">›</button>
+      </div>
+      <div class="gnav-dots" id="gnavDots"></div>
+    </div>
+    <div class="stream-embed-outer" id="streamEmbed"></div>
+  </div>
+
+  <!-- Browse section -->
+  <div class="browse-section">
+    <div class="browse-inner">
+      <div class="browse-header">
+        <span class="browse-title">Games</span>
+        <a class="btn btn-outline btn-sm" onclick="showPage('schedule')">Full Schedule →</a>
+      </div>
+      <div class="browse-tabs" id="browseTabs">
+        <button class="btab active" data-bfilter="upcoming">Upcoming</button>
+        <button class="btab" data-bfilter="all">All</button>
+        <button class="btab" data-bfilter="results">Results</button>
+        <button class="btab" data-bfilter="regular">Regular Season</button>
+        <button class="btab" data-bfilter="playoff">Playoffs</button>
+      </div>
+      <div class="tiles-scroll" id="tilesScroll"></div>
+    </div>
+  </div>
+
+  <!-- Lower: standings + performances -->
+  <div class="home-lower">
+    <!-- Standings -->
+    <div>
+      <div class="home-standings-card">
+        <div class="card-head">
+          <span class="card-head-title">Standings</span>
+          <div style="display:flex;gap:12px;align-items:center;">
+            <a class="card-head-link" onclick="showPage('bracket')">Bracket →</a>
+            <a class="card-head-link" onclick="showPage('standings')">Full →</a>
+          </div>
+        </div>
+        <table class="standings-tbl" id="homeStandingsTbl"></table>
+      </div>
+    </div>
+
+    <!-- Top Performances -->
+    <div>
+      <div class="perf-card">
+        <div class="card-head">
+          <span class="card-head-title">Top Performances</span>
+          <a class="card-head-link" onclick="showPage('highs')">All Highs →</a>
+        </div>
+        <div class="carousel-track">
+          <div class="carousel-slides" id="carouselSlides"></div>
+        </div>
+        <div class="carousel-dots" id="carouselDots"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SCHEDULE ══ -->
+<div class="page" id="page-schedule">
+  <div class="page-inner">
+    <div class="filter-row">
+      <button class="fbtn active" data-filter="all">All</button>
+      <button class="fbtn" data-filter="upcoming">Upcoming</button>
+      <button class="fbtn" data-filter="results">Results</button>
+      <button class="fbtn" data-filter="regular">Regular Season</button>
+      <button class="fbtn" data-filter="playoff">Playoffs</button>
+    </div>
+    <div id="gameList" class="game-list"><div class="loading">Loading</div></div>
+  </div>
+</div>
+
+<!-- ══ STATS ══ -->
+<div class="page" id="page-stats">
+  <div class="page-inner">
+    <div class="subnav">
+      <button class="snbtn active" data-stats="total">Total</button>
+      <button class="snbtn" data-stats="regular">Regular Season</button>
+      <button class="snbtn" data-stats="playoff">Playoffs</button>
+      <button class="snbtn" data-stats="team">Team Stats</button>
+      <button class="snbtn" data-stats="highs">Game Highs</button>
+    </div>
+    <p class="stats-note" id="statsNote">Sorted by PPG. Click any column header to re-sort.</p>
+    <div class="card"><div class="scroll-x"><table id="statsTable"></table></div></div>
+  </div>
+</div>
+
+<!-- ══ STANDINGS ══ -->
+<div class="page" id="page-standings">
+  <div class="page-inner">
+    <div class="card"><div class="scroll-x"><table id="standingsTable"></table></div></div>
+    <div class="tb-box">
+      <h3>Tiebreaker Rules</h3>
+      <ol>
+        <li><strong>Head-to-head record</strong> — among only the tied teams.</li>
+        <li><strong>Record vs. common opponents</strong> — win % against opponents that all tied teams have faced.</li>
+        <li><strong>Overall point differential</strong> — net points across all regular-season games (DIFF column).</li>
+      </ol>
+    </div>
+  </div>
+</div>
+
+<!-- ══ TEAMS ══ -->
+<div class="page" id="page-teams">
+  <div class="page-inner" id="teamsContent"><div class="loading">Loading</div></div>
+</div>
+
+<!-- ══ BRACKET ══ -->
+<div class="page" id="page-bracket">
+  <div class="bracket-hdr">
+    <div class="bracket-hdr-title">Playoffs</div>
+    <div class="bracket-hdr-sub">July 11, 2026 · 3-on-3 Basketball</div>
+  </div>
+  <div id="champBanner"></div>
+  <div class="bracket-wrap"><div id="bracketContent"><div class="loading">Loading</div></div></div>
+</div>
+
+<!-- ══ HIGHS ══ -->
+<div class="page" id="page-highs">
+  <div class="page-inner">
+    <div class="highs-phase-tabs">
+      <button class="hptab active" data-phase="regular">Regular Season</button>
+      <button class="hptab" data-phase="playoff">Playoffs</button>
+    </div>
+    <select class="highs-cat-sel" id="highsCatSel"></select>
+    <div class="highs-list" id="highsList"></div>
+  </div>
+</div>
+
+<!-- ══ BLOG ══ -->
+<div class="page" id="page-blog">
+  <div class="page-inner">
+    <div class="placeholder-card">
+      <h3>Blog — Coming Soon</h3>
+      <p>Game recaps, player spotlights, and league news will live here.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══ ABOUT ══ -->
+<div class="page" id="page-about">
+  <div class="page-inner">
+    <div class="about-section">
+      <h2>What Is the Backyard Summer Classic?</h2>
+      <p>The Backyard Classics is a 3-on-3 basketball tournament bringing together six hand-picked teams for a weekend of competitive ball, community, and unforgettable moments.</p>
+      <p>All games are streamed live on YouTube. <strong>Replace this section with your own About text.</strong></p>
+    </div>
+    <div class="about-section">
+      <h2>Rules of the Classic</h2>
+      <p><strong>Add your official rules here.</strong> Below are placeholder examples — update them to match your actual league rules.</p>
+      <h3>Game Format</h3>
+      <ul>
+        <li>3-on-3, first to 21 points wins (must win by 2).</li>
+        <li>Regular season: 8-minute thirds.</li>
+        <li>Playoffs: 9-minute thirds.</li>
+      </ul>
+      <h3>Scoring</h3>
+      <ul>
+        <li>Field goals inside the arc: 2 points.</li>
+        <li>Field goals outside the arc: 3 points.</li>
+        <li>Free throws: 1 point.</li>
+      </ul>
+      <h3>General Rules</h3>
+      <ul>
+        <li>Add your rules here.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ══ INTEREST ══ -->
+<div class="page" id="page-interest">
+  <div class="page-inner">
+    <div class="about-section" style="margin-bottom:20px">
+      <h2>Play in a Future Tournament</h2>
+      <p>Interested in competing in an upcoming Backyard Classics event? Fill out the form below and we'll reach out when registration opens.</p>
+    </div>
+    <!-- Replace with: <iframe class="form-embed" src="YOUR_GOOGLE_FORM_EMBED_URL" frameborder="0"></iframe> -->
+    <div class="form-ph">
+      <h3>Interest Form</h3>
+      <p>Create a Google Form, then replace this div with the embed iframe.</p>
+      <code>SETUP: Google Forms → Send → Embed → copy src URL → &lt;iframe class="form-embed" src="URL"&gt;&lt;/iframe&gt;</code>
+    </div>
+  </div>
+</div>
+
+<script>
+'use strict';
+// ============================================================
+//  CONFIG
+// ============================================================
+const API_URL = 'YOUR_APPS_SCRIPT_DEPLOYMENT_URL_HERE';
+
+const STREAMS = [
+  { key:'night1',   id:'_j6HDtjjJrk', label:'Opening Night',           games:['Game 1','Game 2','Game 3','Game 4','Game 5'],    start:new Date('2026-07-10T00:30Z'), end:new Date('2026-07-10T06:30Z') },
+  { key:'day2',     id:'ndwp8APUbR0',  label:'Day 2 — Morning Session', games:['Game 6','Game 7','Game 8'],                      start:new Date('2026-07-10T16:30Z'), end:new Date('2026-07-10T20:30Z') },
+  { key:'night2',   id:'IxR8_E3QgAk',  label:'Night 2',                 games:['Game 9','Game 10','Game 11','Game 12'],           start:new Date('2026-07-11T00:30Z'), end:new Date('2026-07-11T05:30Z') },
+  { key:'quarters', id:'RV4cJQyg8RU',  label:'Quarterfinals',           games:['QF1','QF2'],                                      start:new Date('2026-07-11T16:30Z'), end:new Date('2026-07-11T20:30Z') },
+  { key:'champ',    id:'aYisbhfZNSU',  label:'Championship Night',      games:['SF1','SF2','Final'],                               start:new Date('2026-07-12T00:00Z'), end:new Date('2026-07-12T07:30Z') },
+];
+
+// ============================================================
+//  STATE
+// ============================================================
+let _data = null;
+let _carIdx = 0, _carItems = [], _carTimer = null;
+let _statsSort = { col:'ppg', dir:-1 };
+let _statTab   = 'total';
+let _schedFilter = 'all';
+let _browseFilter = 'upcoming';
+let _higgsPhase = 'regular';
+let _teamView = 'home';
+let _gnavIdx = 0, _gnavItems = [];
+
+// ============================================================
+//  NAV
+// ============================================================
+document.querySelectorAll('.nav-btn[data-page]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const p = btn.dataset.page;
+    if (p === 'teams') {
+      if (window.innerWidth < 900) {
+        document.getElementById('teamDropdown').classList.toggle('open');
+        return;
+      }
+      navigateTeams('home'); return;
+    }
+    showPage(p);
+  });
+});
+document.addEventListener('click', e => {
+  const dd = document.getElementById('teamDropdown');
+  if (!document.querySelector('.nav-has-dd').contains(e.target)) dd.classList.remove('open');
+});
+
+function showPage(name) {
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const btn = document.querySelector(`.nav-btn[data-page="${name}"]`);
+  if (btn) btn.classList.add('active');
+  const pg = document.getElementById('page-' + name);
+  if (pg) pg.classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function navigateTeams(view) {
+  _teamView = view;
+  showPage('teams');
+  document.getElementById('teamDropdown').classList.remove('open');
+  if (_data) renderTeamsPage();
+}
+
+// ============================================================
+//  FETCH
+// ============================================================
+async function fetchData() {
+  if (API_URL === 'YOUR_APPS_SCRIPT_DEPLOYMENT_URL_HERE') {
+    document.getElementById('gameList').innerHTML = '<div class="setup-box"><strong>Setup Required</strong>Paste your Apps Script URL into <code>API_URL</code> near the top of the &lt;script&gt; section.</div>';
+    return;
+  }
+  try {
+    const res = await fetch(API_URL, { redirect:'follow' });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    _data = await res.json();
+    if (_data.error) throw new Error(_data.error);
+    renderAll();
+    document.getElementById('rdot').classList.remove('stale');
+    document.getElementById('rtime').textContent = 'Updated ' + new Date(_data.lastUpdated).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+  } catch (err) {
+    console.error(err);
+    document.getElementById('rdot').classList.add('stale');
+    document.getElementById('rtime').textContent = 'Error';
+    ['gameList','teamsContent'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.innerHTML = `<div class="err-box"><strong>Could not load data</strong>${err.message}</div>`;
+    });
+  }
+}
+
+function renderAll() {
+  populateTeamDropdown();
+  renderGameNav();
+  renderStream();
+  renderTiles();
+  renderHomeStandings();
+  renderCarousel();
+  renderSchedule();
+  renderStats();
+  renderStandings();
+  renderTeamsPage();
+  renderBracket();
+  renderHighs();
+}
+
+// ============================================================
+//  HELPERS
+// ============================================================
+const pct = v => (v*100).toFixed(1)+'%';
+const f1  = v => Number(v||0).toFixed(1);
+
+function fmtDate(ds) {
+  if (!ds) return '';
+  const [y,m,d] = ds.split('-').map(Number);
+  return new Date(y,m-1,d).toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+}
+function initials(name) {
+  if (!name) return '?';
+  return name.split(/\s+/).map(w=>w[0]).join('').slice(0,3).toUpperCase();
+}
+// Wrap team name in a clickable span
+const T = (name, cls='') => {
+  if (!name || name==='TBD') return `<span>${name||'TBD'}</span>`;
+  const safe = name.replace(/'/g,"\\'");
+  return `<span class="tlink${cls?' '+cls:''}" onclick="navigateTeams('${safe}')">${name}</span>`;
+};
+// Team logo placeholder (swap for <img> when logos ready)
+const logoDiv = (name, size=28, cls='') =>
+  `<div class="${cls||'standings-logo'}" style="width:${size}px;height:${size}px;font-size:${Math.round(size*0.32)}px">${initials(name)}</div>`;
+
+const streamForGame = (gameTab, gameType) =>
+  STREAMS.find(s=>s.games.includes(gameTab)) ||
+  STREAMS.find(s=>s.games.includes(gameType)) || null;
+
+function leadingScorer(teamName) {
+  const players = (_data.stats.total||[]).filter(p=>p.team===teamName&&p.gp>0);
+  if (!players.length) return null;
+  return players.reduce((best,p)=>p.ppg>best.ppg?p:best);
+}
+
+// Find game tab for a performance (for box score links in Highs)
+function findGameTabForPerf(teamName, opponent, date) {
+  const g = (_data.schedule||[]).find(g=>
+    g.date===date &&
+    ((g.teamA===teamName&&g.teamB===opponent)||(g.teamB===teamName&&g.teamA===opponent))
+  );
+  return g ? g.gameTab : null;
+}
+
+// ============================================================
+//  TEAM DROPDOWN
+// ============================================================
+function populateTeamDropdown() {
+  const dd = document.getElementById('teamDropdown');
+  dd.querySelectorAll('.team-entry').forEach(e=>e.remove());
+  (_data.teams||[]).forEach(t=>{
+    const btn = document.createElement('button');
+    btn.className = 'nav-dd-item team-entry';
+    btn.innerHTML = `<div class="nav-dd-logo-ph">${initials(t.name)}</div>${t.name}`;
+    btn.onclick = () => navigateTeams(t.name);
+    dd.appendChild(btn);
+  });
+}
+
+// ============================================================
+//  GAME NAVIGATOR (above stream)
+// ============================================================
+function renderGameNav() {
+  const all = _data.schedule||[];
+  _gnavItems = all.filter(g=>!g.played && g.teamA);
+  const slidesEl = document.getElementById('gnavSlides');
+  const dotsEl   = document.getElementById('gnavDots');
+  if (!_gnavItems.length) {
+    slidesEl.innerHTML = `<div class="gnav-chip"><span class="gnav-empty">No upcoming games</span></div>`;
+    dotsEl.innerHTML = '';
+    return;
+  }
+  slidesEl.innerHTML = _gnavItems.map(g => {
+    const s = streamForGame(g.gameTab, g.gameType);
+    const watchBtn = s ? `<a class="btn btn-watch btn-sm" href="https://www.youtube.com/watch?v=${s.id}" target="_blank" rel="noopener">▶ Watch</a>` : '';
+    return `<div class="gnav-chip">
+      <div class="gnav-chip-logo">${initials(g.teamA)}</div>
+      <div class="gnav-info">
+        <div class="gnav-teams">${g.teamA} vs ${g.teamB}</div>
+        <div class="gnav-meta">${fmtDate(g.date)} · ${g.time} · ${g.gameType}</div>
+      </div>
+      <div class="gnav-vs">${watchBtn}</div>
+      <div class="gnav-chip-logo">${initials(g.teamB)}</div>
+    </div>`;
+  }).join('');
+  dotsEl.innerHTML = _gnavItems.map((_,i)=>`<div class="gnav-dot${i===0?' active':''}"></div>`).join('');
+  _gnavIdx = 0;
+}
+
+document.getElementById('gnavPrev').onclick = () => setGnav((_gnavIdx-1+_gnavItems.length)%_gnavItems.length);
+document.getElementById('gnavNext').onclick = () => setGnav((_gnavIdx+1)%_gnavItems.length);
+
+function setGnav(i) {
+  _gnavIdx = i;
+  const slides = document.getElementById('gnavSlides');
+  if (slides) slides.style.transform = `translateX(-${i*100}%)`;
+  document.querySelectorAll('.gnav-dot').forEach((d,j)=>d.classList.toggle('active',j===i));
+}
+
+// ============================================================
+//  STREAM
+// ============================================================
+const activeStream = () => STREAMS.find(s=>{const n=new Date();return n>=s.start&&n<s.end;})||null;
+const nextStream   = () => STREAMS.find(s=>new Date()<s.start)||null;
+
+function renderStream() {
+  const el  = document.getElementById('streamEmbed');
+  const act = activeStream();
+  const nxt = nextStream();
+  const embedId = act ? act.id : nxt ? nxt.id : STREAMS[STREAMS.length-1].id;
+  el.innerHTML = `<iframe src="https://www.youtube.com/embed/${embedId}?autoplay=0" allowfullscreen allow="accelerometer;autoplay;clipboard-write;encrypted-media;picture-in-picture" title="Backyard Classics"></iframe>`;
+}
+
+// ============================================================
+//  NETFLIX TILES
+// ============================================================
+document.querySelectorAll('.btab').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.btab').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    _browseFilter = btn.dataset.bfilter;
+    renderTiles();
+  });
+});
+
+function renderTiles() {
+  const el = document.getElementById('tilesScroll');
+  if (!_data) return;
+  let games = _data.schedule||[];
+  if (_browseFilter==='upcoming') games = games.filter(g=>!g.played);
+  if (_browseFilter==='results')  games = games.filter(g=>g.played);
+  if (_browseFilter==='regular')  games = games.filter(g=>g.gameType==='Regular');
+  if (_browseFilter==='playoff')  games = games.filter(g=>g.gameType&&g.gameType!=='Regular');
+  if (!games.length) {
+    el.innerHTML = `<div class="tile-empty">No games match this filter</div>`;
+    return;
+  }
+  const stnds = _data.standings||[];
+  const recordOf = name => { const s=stnds.find(x=>x.team===name); return s?`${s.w}-${s.l}`:'-'; };
+  el.innerHTML = games.map(g=>{
+    const s = streamForGame(g.gameTab, g.gameType);
+    const watchUrl = s ? `https://www.youtube.com/watch?v=${s.id}` : null;
+    const bs = (_data.boxScores||{})[g.gameTab];
+    const wA = g.played&&g.winner===g.teamA, wB = g.played&&g.winner===g.teamB;
+    const score = g.played
+      ? `<div class="tile-score"><span>${g.scoreA}</span><span class="sep">–</span><span>${g.scoreB}</span></div>`
+      : `<div style="font-size:12px;color:var(--text-muted)">${g.time}</div>`;
+    const statusText = g.played ? (g.ot?g.status:'Final') : 'Upcoming';
+    const statusCls  = g.played ? 'final' : 'upcoming';
+    const watchBtn = watchUrl ? `<a class="btn btn-watch btn-sm" href="${watchUrl}" target="_blank" rel="noopener">▶ Watch</a>` : '';
+    const bsBtn    = (g.played&&bs) ? `<button class="btn btn-outline btn-sm" onclick="openBoxScoreFromTile('${g.gameTab}')">Box Score</button>` : '';
+    return `<div class="tile">
+      <div class="tile-header">
+        <span class="tile-type">${g.gameType||'Game'}</span>
+        <span class="tile-datetime">${fmtDate(g.date)}</span>
+      </div>
+      <div class="tile-matchup">
+        <div class="tile-team">
+          <div class="tile-logo">${initials(g.teamA)}</div>
+          <div class="tile-team-name ${wA?'':'loser'}" onclick="navigateTeams('${g.teamA}')">${g.teamA}</div>
+          <div class="tile-team-record">${g.played&&wA?'<b>W</b> · ':''}${recordOf(g.teamA)}</div>
+        </div>
+        <div>
+          ${score}
+          <div class="tile-status ${statusCls}" style="margin-top:4px">${statusText}</div>
+        </div>
+        <div class="tile-team">
+          <div class="tile-logo">${initials(g.teamB)}</div>
+          <div class="tile-team-name ${wB?'':'loser'}" onclick="navigateTeams('${g.teamB}')">${g.teamB}</div>
+          <div class="tile-team-record">${g.played&&wB?'<b>W</b> · ':''}${recordOf(g.teamB)}</div>
+        </div>
+      </div>
+      <div class="tile-actions">${watchBtn}${bsBtn}</div>
+    </div>`;
+  }).join('');
+}
+
+// open a box score panel from tile (navigate to schedule + expand)
+function openBoxScoreFromTile(gameTab) {
+  showPage('schedule');
+  setTimeout(()=>{
+    const panel = document.getElementById('box-'+gameTab);
+    if (panel&&!panel.classList.contains('open')) {
+      panel.classList.add('open');
+      panel.scrollIntoView({behavior:'smooth',block:'center'});
+    }
+  }, 200);
+}
+
+// ============================================================
+//  HOME STANDINGS
+// ============================================================
+function renderHomeStandings() {
+  const rows = _data.standings||[];
+  const el   = document.getElementById('homeStandingsTbl');
+  el.innerHTML = `<thead><tr>
+    <th style="background:var(--bg-raised)">#</th>
+    <th style="background:var(--bg-raised)">Team</th>
+    <th style="background:var(--bg-raised)">W</th>
+    <th style="background:var(--bg-raised)">L</th>
+    <th style="background:var(--bg-raised)">PF</th>
+    <th style="background:var(--bg-raised)">PA</th>
+    <th style="background:var(--bg-raised)">DIFF</th>
+  </tr></thead><tbody>${rows.map((r,i)=>`<tr>
+    <td class="mono" style="${i===0?'color:var(--gold);font-weight:800':'color:var(--text-muted)'}">${r.seed}</td>
+    <td>
+      <div class="standings-team-cell">
+        ${logoDiv(r.team,28)}
+        ${T(r.team,'standings-tbl-tlink')}
+      </div>
+    </td>
+    <td class="mono" style="${i===0?'font-weight:700':''}">${r.w}</td>
+    <td class="mono">${r.l}</td>
+    <td class="mono">${r.pf}</td>
+    <td class="mono">${r.pa}</td>
+    <td class="mono" style="color:${r.diff>0?'var(--green)':r.diff<0?'var(--red)':'var(--text-muted)'}">
+      ${r.diff>0?'+':''}${r.diff}
+    </td>
+  </tr>`).join('')}</tbody>`;
+}
+
+// ============================================================
+//  CAROUSEL (top 3 per category)
+// ============================================================
+function buildCarouselItems() {
+  const h = _data.tournamentHighs; if (!h) return [];
+  const items = [];
+  for (const [phase,lbl] of [['regular','Regular Season'],['playoff','Playoffs']]) {
+    for (const [cat,entries] of Object.entries(h[phase]||{})) {
+      (entries||[]).slice(0,3).forEach(e => items.push({cat,phaseLabel:lbl,...e}));
+    }
+  }
+  return items;
+}
+
+function renderCarousel() {
+  _carItems = buildCarouselItems();
+  const slides = document.getElementById('carouselSlides');
+  const dots   = document.getElementById('carouselDots');
+  if (!_carItems.length) {
+    slides.innerHTML = '<div class="carousel-slide"><div style="color:var(--text-muted);width:100%;text-align:center;padding:20px">No performances yet</div></div>';
+    dots.innerHTML = '';
+    return;
+  }
+  slides.innerHTML = _carItems.map(it=>`
+    <div class="carousel-slide">
+      <div class="c-val">${it.value}</div>
+      <div>
+        <div class="c-cat">${it.cat}</div>
+        <div class="c-player" onclick="navigateTeams('${it.team}')">${it.player}</div>
+        <div class="c-detail">${it.team} · vs ${it.opponent} · ${it.date}</div>
+        <span class="c-phase">${it.phaseLabel}</span>
+        <div class="c-rank">Rank #${it.rank}</div>
+      </div>
+    </div>`).join('');
+  dots.innerHTML = _carItems.map((_,i)=>`<div class="cdot${i===0?' active':''}"></div>`).join('');
+  _carIdx = 0;
+  clearInterval(_carTimer);
+  _carTimer = setInterval(advanceCar, 4000);
+}
+
+function advanceCar() {
+  if (!_carItems.length) return;
+  _carIdx = (_carIdx+1)%_carItems.length;
+  document.getElementById('carouselSlides').style.transform = `translateX(-${_carIdx*100}%)`;
+  document.querySelectorAll('.cdot').forEach((d,i)=>d.classList.toggle('active',i===_carIdx));
+}
+
+// ============================================================
+//  SCHEDULE (Yahoo Sports style)
+// ============================================================
+document.querySelectorAll('.fbtn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.fbtn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    _schedFilter = btn.dataset.filter;
+    renderSchedule();
+  });
+});
+
+function renderSchedule() {
+  const el = document.getElementById('gameList'); if (!_data||!el) return;
+  let games = _data.schedule||[];
+  if (_schedFilter==='upcoming') games = games.filter(g=>!g.played);
+  if (_schedFilter==='results')  games = games.filter(g=>g.played);
+  if (_schedFilter==='regular')  games = games.filter(g=>g.gameType==='Regular');
+  if (_schedFilter==='playoff')  games = games.filter(g=>g.gameType&&g.gameType!=='Regular');
+  if (!games.length) { el.innerHTML = '<div class="empty">No games match this filter</div>'; return; }
+
+  const stnds = _data.standings||[];
+  const seedOf = name => { const s=stnds.find(x=>x.team===name); return s?s.seed:null; };
+  const recordOf = name => { const s=stnds.find(x=>x.team===name); return s?`${s.w}–${s.l}`:null; };
+
+  el.innerHTML = games.map(g=>{
+    const isPlayoff = g.gameType&&g.gameType!=='Regular';
+    const stream = streamForGame(g.gameTab, g.gameType);
+    const watchUrl = stream ? `https://www.youtube.com/watch?v=${stream.id}` : null;
+    const bs = (_data.boxScores||{})[g.gameTab];
+    const hasBox = g.played && bs;
+    const wA = g.played&&g.winner===g.teamA, wB = g.played&&g.winner===g.teamB;
+    const lsA = leadingScorer(g.teamA), lsB = leadingScorer(g.teamB);
+
+    const teamSubtitle = (name, w) => {
+      const seed = isPlayoff ? seedOf(name) : null;
+      const rec  = recordOf(name);
+      return seed ? `Seed ${seed}` : rec || '';
+    };
+
+    const badge = g.played
+      ? (g.ot?`<span class="badge badge-ot">${g.status}</span>`:`<span class="badge badge-final">Final</span>`)
+      : `<span class="badge badge-up">${g.time}</span>`;
+
+    const watchBtn = watchUrl ? `<a class="btn btn-watch btn-sm" href="${watchUrl}" target="_blank" rel="noopener">▶ Watch</a>` : '';
+    const boxBtn   = hasBox ? `<button class="btn btn-outline btn-sm" onclick="toggleBox('${g.gameTab}',this)">Box Score</button>` : '';
+
+    return `<div class="yahoo-game">
+      <div class="yg-top">
+        <span class="yg-type">${g.gameType||'Game'}</span>
+        <span class="yg-date">${fmtDate(g.date)}</span>
+        ${badge}
+      </div>
+      <div class="yg-body">
+        <div class="yg-team" style="text-align:left">
+          <div class="yg-team-row">
+            <div class="yg-logo">${initials(g.teamA)}</div>
+            ${T(g.teamA,'yg-team-name '+(g.played?(wA?'winner':'loser'):''))}
+          </div>
+          <div class="yg-record">${teamSubtitle(g.teamA,wA)}</div>
+          ${lsA?`<div class="yg-leader"><span class="lname tlink" onclick="navigateTeams('${lsA.team}')">${lsA.player}</span> · ${f1(lsA.ppg)} PPG</div>`:''}
+        </div>
+        <div class="yg-center">
+          ${g.played
+            ? `<div class="yg-score"><span style="${wA?'':'color:var(--text-muted)'}">${g.scoreA}</span><span class="sep">–</span><span style="${wB?'':'color:var(--text-muted)'}">${g.scoreB}</span></div>`
+            : `<div class="yg-time">${g.time}</div>`}
+        </div>
+        <div class="yg-team" style="text-align:right">
+          <div class="yg-team-row" style="flex-direction:row-reverse">
+            <div class="yg-logo">${initials(g.teamB)}</div>
+            ${T(g.teamB,'yg-team-name '+(g.played?(wB?'winner':'loser'):''))}
+          </div>
+          <div class="yg-record">${teamSubtitle(g.teamB,wB)}</div>
+          ${lsB?`<div class="yg-leader" style="text-align:right"><span class="lname tlink" onclick="navigateTeams('${lsB.team}')">${lsB.player}</span> · ${f1(lsB.ppg)} PPG</div>`:''}
+        </div>
+      </div>
+      <div class="yg-actions">${watchBtn}${boxBtn}</div>
+      ${hasBox?`<div class="box-panel" id="box-${g.gameTab}"><div class="box-inner">${buildBoxScore(g,bs)}</div></div>`:''}
+    </div>`;
+  }).join('');
+}
+
+function toggleBox(tab, btn) {
+  const p = document.getElementById('box-'+tab); if (!p) return;
+  const open = p.classList.toggle('open');
+  btn.textContent = open ? 'Hide Box Score' : 'Box Score';
+}
+
+function buildBoxScore(game, bs) {
+  const side = (players, teamName) => {
+    if (!players||!players.length) return '';
+    const tot = players.reduce((acc,p)=>{
+      ['twoPM','twoPA','threePM','threePA','ftm','fta','reb','ast','stl','blk','tov','pts'].forEach(k=>acc[k]=(acc[k]||0)+p[k]);
+      return acc;
+    },{});
+    const rows = [...players, {...tot, player:'TOTALS', isTot:true}].map(p=>
+      `<tr${p.isTot?' class="box-tot"':''}><td class="name" style="max-width:130px">${p.player}</td>
+      <td>${p.pts}</td><td>${p.twoPM}/${p.twoPA}</td><td>${p.threePM}/${p.threePA}</td>
+      <td>${p.ftm}/${p.fta}</td><td>${p.reb}</td><td>${p.ast}</td><td>${p.stl}</td><td>${p.blk}</td><td>${p.tov}</td></tr>`
+    ).join('');
+    return `<div><div class="box-team-lbl">${teamName}</div>
+    <div class="scroll-x"><table class="box-tbl">
+    <thead><tr><th>Player</th><th>PTS</th><th>2PM/A</th><th>3PM/A</th><th>FT</th><th>REB</th><th>AST</th><th>STL</th><th>BLK</th><th>TOV</th></tr></thead>
+    <tbody>${rows}</tbody></table></div></div>`;
+  };
+  const sA = bs.A||[], sB = bs.B||[];
+  return `<div class="box-grid">${side(sA,sA.length?sA[0].team:game.teamA)}${side(sB,sB.length?sB[0].team:game.teamB)}</div>`;
+}
+
+// ============================================================
+//  STATS
+// ============================================================
+document.querySelectorAll('.snbtn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.snbtn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    _statTab = btn.dataset.stats;
+    renderStats();
+  });
+});
+
+const PCOLS = [
+  {key:'rank',label:'#',fmt:v=>v},{key:'player',label:'Player',fmt:v=>v,name:true},
+  {key:'team',label:'Team',fmt:v=>v,name:true},{key:'type',label:'Type',fmt:v=>v},
+  {key:'gp',label:'GP',fmt:v=>v},{key:'ppg',label:'PPG',fmt:v=>f1(v)},
+  {key:'rpg',label:'RPG',fmt:v=>f1(v)},{key:'orpg',label:'ORPG',fmt:v=>f1(v)},
+  {key:'drpg',label:'DRPG',fmt:v=>f1(v)},{key:'apg',label:'APG',fmt:v=>f1(v)},
+  {key:'spg',label:'SPG',fmt:v=>f1(v)},{key:'bpg',label:'BPG',fmt:v=>f1(v)},
+  {key:'topg',label:'TOPG',fmt:v=>f1(v)},{key:'fgPct',label:'FG%',fmt:v=>pct(v)},
+  {key:'twoPct',label:'2P%',fmt:v=>pct(v)},{key:'threePct',label:'3P%',fmt:v=>pct(v)},
+  {key:'ftPct',label:'FT%',fmt:v=>pct(v)},{key:'fgPerGame',label:'FG/G',fmt:v=>f1(v)},
+  {key:'threePtPerGame',label:'3/G',fmt:v=>f1(v)},{key:'ftPerGame',label:'FT/G',fmt:v=>f1(v)},
+  {key:'efgPct',label:'eFG%',fmt:v=>pct(v)},{key:'tsPct',label:'TS%',fmt:v=>pct(v)},
+];
+
+const TCOLS = [
+  {key:'seed',label:'#',fmt:v=>v},{key:'team',label:'Team',fmt:v=>v,name:true},
+  {key:'w',label:'W',fmt:v=>v},{key:'l',label:'L',fmt:v=>v},
+  {key:'ppg',label:'PPG',fmt:v=>f1(v)},{key:'oppPpg',label:'Opp PPG',fmt:v=>f1(v)},
+  {key:'diff',label:'DIFF',fmt:v=>(v>0?'+':'')+v},
+  {key:'rpg',label:'RPG',fmt:v=>f1(v)},{key:'apg',label:'APG',fmt:v=>f1(v)},
+  {key:'spg',label:'SPG',fmt:v=>f1(v)},{key:'bpg',label:'BPG',fmt:v=>f1(v)},
+  {key:'topg',label:'TOPG',fmt:v=>f1(v)},
+  {key:'fgPct',label:'FG%',fmt:v=>pct(v)},{key:'fgmPg',label:'FGM/G',fmt:v=>f1(v)},
+  {key:'fgaPg',label:'FGA/G',fmt:v=>f1(v)},
+  {key:'threePct',label:'3P%',fmt:v=>pct(v)},{key:'threemPg',label:'3PM/G',fmt:v=>f1(v)},
+  {key:'threeaPg',label:'3PA/G',fmt:v=>f1(v)},
+  {key:'ftPct',label:'FT%',fmt:v=>pct(v)},{key:'ftmPg',label:'FTM/G',fmt:v=>f1(v)},
+  {key:'ftaPg',label:'FTA/G',fmt:v=>f1(v)},
+];
+
+function computeTeamStats() {
+  if (!_data) return [];
+  return (_data.standings||[]).map(s=>{
+    const gp = s.w+s.l;
+    const pl = (_data.stats.total||[]).filter(p=>p.team===s.team);
+    const pgS = key => gp>0 ? pl.reduce((acc,p)=>acc+(p[key]||0)*(p.gp||0),0)/gp : 0;
+    // shooting totals per game
+    const fgmPg    = pgS('fgPerGame');
+    const fgaPg    = gp>0 ? pl.reduce((acc,p)=>acc+(p.gp||0)*(p.fgPct>0?p.fgPerGame/p.fgPct:0),0)/gp : 0;
+    const threemPg = pgS('threePtPerGame');
+    const threeaPg = gp>0 ? pl.reduce((acc,p)=>acc+(p.gp||0)*(p.threePct>0?p.threePtPerGame/p.threePct:0),0)/gp : 0;
+    const ftmPg    = pgS('ftPerGame');
+    const ftaPg    = gp>0 ? pl.reduce((acc,p)=>acc+(p.gp||0)*(p.ftPct>0?p.ftPerGame/p.ftPct:0),0)/gp : 0;
+    return {
+      seed:s.seed, team:s.team, w:s.w, l:s.l, gp,
+      ppg: gp>0?s.pf/gp:0, oppPpg: gp>0?s.pa/gp:0, diff:s.diff,
+      rpg:pgS('rpg'), apg:pgS('apg'), spg:pgS('spg'), bpg:pgS('bpg'), topg:pgS('topg'),
+      fgPct:    fgaPg>0?fgmPg/fgaPg:0, fgmPg, fgaPg,
+      threePct: threeaPg>0?threemPg/threeaPg:0, threemPg, threeaPg,
+      ftPct:    ftaPg>0?ftmPg/ftaPg:0, ftmPg, ftaPg,
+    };
+  });
+}
+
+function renderStats() {
+  const el   = document.getElementById('statsTable');
+  const note = document.getElementById('statsNote');
+  if (!_data) return;
+
+  if (_statTab==='team') {
+    note.textContent = 'Team totals per game. PPG/Opp PPG from standings; shooting totals reconstructed from player averages.';
+    const rows = computeTeamStats().sort((a,b)=>_statsSort.dir*((a[_statsSort.col]||0)-(b[_statsSort.col]||0)));
+    const head = TCOLS.map(c=>{
+      const s=_statsSort.col===c.key;
+      return `<th class="${s?'sorted':''}" onclick="sortStats('${c.key}')">${c.label}${s?(_statsSort.dir===-1?' ▼':' ▲'):''}`;
+    }).join('');
+    const body = rows.map(r=>TCOLS.map(c=>{
+      const v=r[c.key]??0;
+      const dc = c.key==='diff'?(v>0?'color:var(--green)':v<0?'color:var(--red)':''):'';
+      const td = c.name?`<td class="name" style="${dc}">${T(r[c.key])}</td>`:`<td style="${dc}">${c.fmt(v)}</td>`;
+      return td;
+    }).join('')).map(c=>`<tr>${c}</tr>`).join('');
+    el.innerHTML = `<thead><tr>${head}</tr></thead><tbody>${body}</tbody>`;
+    return;
+  }
+
+  if (_statTab==='highs') {
+    note.textContent = 'Best single-game performances.';
+    el.innerHTML = buildHighsSummaryTable(); return;
+  }
+
+  note.textContent = 'Sorted by PPG. Click any column header to re-sort.';
+  let rows = [...(_data.stats[_statTab]||[])];
+  rows.sort((a,b)=>_statsSort.dir*((a[_statsSort.col]||0)-(b[_statsSort.col]||0)));
+  rows.forEach((r,i)=>r.rank=i+1);
+  const head = PCOLS.map(c=>{
+    const s=_statsSort.col===c.key;
+    return `<th class="${s?'sorted':''}" onclick="sortStats('${c.key}')">${c.label}${s?(_statsSort.dir===-1?' ▼':' ▲'):''}`;
+  }).join('');
+  const body = rows.map(r=>PCOLS.map(c=>{
+    if (c.key==='player') return `<td class="name">${T(r.player)}</td>`;
+    if (c.key==='team')   return `<td class="name">${T(r.team)}</td>`;
+    return `<td>${c.fmt(r[c.key]??0)}</td>`;
+  }).join('')).map(c=>`<tr>${c}</tr>`).join('');
+  el.innerHTML = `<thead><tr>${head}</tr></thead><tbody>${body}</tbody>`;
+}
+
+function sortStats(col) {
+  _statsSort = _statsSort.col===col ? {col,dir:_statsSort.dir*-1} : {col,dir:-1};
+  renderStats();
+}
+
+function buildHighsSummaryTable() {
+  if (!_data.tournamentHighs) return '<tbody><tr><td class="empty">No data yet</td></tr></tbody>';
+  let html = '<thead></thead><tbody>';
+  for (const [phase,lbl] of [['regular','Regular Season'],['playoff','Playoffs']]) {
+    const sec = _data.tournamentHighs[phase]||{};
+    html += `<tr><td colspan="6" style="padding:14px 12px 8px;font-family:var(--font-display);font-weight:900;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted);border-bottom:1px solid var(--border)">${lbl}</td></tr>`;
+    for (const [cat,entries] of Object.entries(sec)) {
+      if (!entries||!entries.length) continue;
+      const t = entries[0];
+      html += `<tr style="border-bottom:1px solid rgba(0,0,0,.06)">
+        <td style="color:var(--text-muted);font-size:12px;font-family:var(--font-body);width:170px">${cat}</td>
+        <td style="font-family:var(--font-display);font-size:18px;font-weight:900;color:var(--accent)">${t.value}</td>
+        <td class="name">${T(t.player)}</td>
+        <td style="color:var(--text-dim)">${T(t.team)}</td>
+        <td style="color:var(--text-muted)">${t.date}</td>
+        <td style="color:var(--text-muted)">vs ${T(t.opponent)}</td>
+      </tr>`;
+    }
+  }
+  return html + '</tbody>';
+}
+
+// ============================================================
+//  STANDINGS
+// ============================================================
+function renderStandings() {
+  const el = document.getElementById('standingsTable');
+  const rows = _data.standings||[];
+  el.innerHTML = `<thead><tr>
+    <th>Seed</th><th>Team</th><th>W</th><th>L</th><th>WIN%</th><th>PF</th><th>PA</th><th>DIFF</th>
+  </tr></thead><tbody>${rows.map((r,i)=>`<tr>
+    <td class="mono" style="${i===0?'color:var(--gold);font-weight:800':'color:var(--text-muted)'}">${r.seed}</td>
+    <td>
+      <div class="standings-team-cell">
+        ${logoDiv(r.team,28)}
+        ${T(r.team,'standings-tbl-tlink')}
+      </div>
+    </td>
+    <td class="mono">${r.w}</td><td class="mono">${r.l}</td>
+    <td class="mono">${(r.pct*100).toFixed(1)}%</td>
+    <td class="mono">${r.pf}</td><td class="mono">${r.pa}</td>
+    <td class="mono" style="color:${r.diff>0?'var(--green)':r.diff<0?'var(--red)':'var(--text-muted)'}">
+      ${r.diff>0?'+':''}${r.diff}
+    </td>
+  </tr>`).join('')}</tbody>`;
+}
+
+// ============================================================
+//  TEAMS
+// ============================================================
+function renderTeamsPage() {
+  const el = document.getElementById('teamsContent');
+  if (!_data) return;
+  _teamView==='home' ? renderTeamsHome(el) : renderTeamDetail(el,_teamView);
+}
+
+function renderTeamsHome(el) {
+  const teams = _data.teams||[];
+  if (!teams.length) { el.innerHTML='<div class="empty">No team data</div>'; return; }
+  el.innerHTML = `<div class="sect-title" style="margin-bottom:16px">All Teams</div>
+  <div class="team-grid">${teams.map(t=>{
+    const s=(_data.standings||[]).find(x=>x.team===t.name)||{};
+    const gp=(s.w||0)+(s.l||0);
+    return `<div class="team-card" onclick="navigateTeams('${t.name}')">
+      <div class="team-card-head">
+        <div class="tc-logo">${initials(t.name)}</div>
+        <div>
+          <div class="tc-name">${t.name}</div>
+          <div class="tc-record">${s.w||0}–${s.l||0}${gp?` · ${((s.w||0)/gp*100).toFixed(0)}%`:''}</div>
+        </div>
+      </div>
+      <div class="tc-cap">Captain: <span>${t.captain}</span></div>
+    </div>`;
+  }).join('')}</div>`;
+}
+
+function renderTeamDetail(el, teamName) {
+  const teamInfo = (_data.teams||[]).find(t=>t.name===teamName);
+  const standing = (_data.standings||[]).find(s=>s.team===teamName)||{};
+  const gp = (standing.w||0)+(standing.l||0);
+  const players = (_data.stats.total||[]).filter(p=>p.team===teamName);
+
+  const roster = [];
+  if (teamInfo) {
+    if (teamInfo.captain) roster.push({name:teamInfo.captain,role:'Captain',cls:'role-cap'});
+    if (teamInfo.round1)  roster.push({name:teamInfo.round1, role:'1st Round Pick',cls:'role-r1'});
+    if (teamInfo.round2)  roster.push({name:teamInfo.round2, role:'2nd Round Pick',cls:'role-core'});
+    if (teamInfo.round3)  roster.push({name:teamInfo.round3, role:'3rd Round Pick',cls:'role-core'});
+    if (teamInfo.sub)     roster.push({name:teamInfo.sub,    role:'Sub',cls:'role-sub'});
+  }
+
+  const tot = players.reduce((acc,p)=>{
+    const g=p.gp||0;
+    acc.gp+=g; acc.pts+=(p.ppg||0)*g; acc.reb+=(p.rpg||0)*g;
+    acc.ast+=(p.apg||0)*g; acc.stl+=(p.spg||0)*g; acc.blk+=(p.bpg||0)*g; acc.tov+=(p.topg||0)*g;
+    return acc;
+  },{gp:0,pts:0,reb:0,ast:0,stl:0,blk:0,tov:0});
+
+  const games = (_data.schedule||[]).filter(g=>g.teamA===teamName||g.teamB===teamName);
+
+  el.innerHTML = `
+    <button class="btn btn-ghost" style="margin-bottom:16px" onclick="navigateTeams('home')">← All Teams</button>
+    <div class="td-hdr">
+      <div class="td-logo">${initials(teamName)}</div>
+      <div>
+        <div class="td-name">${teamName}</div>
+        <div class="td-meta">
+          ${[{v:standing.w||0,l:'Wins'},{v:standing.l||0,l:'Losses'},{v:gp>0?f1((standing.pf||0)/gp):'—',l:'PPG'},{v:(standing.diff||0)>0?'+'+(standing.diff||0):(standing.diff||0),l:'Diff',c:(standing.diff||0)>0?'var(--green)':(standing.diff||0)<0?'var(--red)':'inherit'}].map(s=>`
+          <div><div class="td-stat-val" style="${s.c?'color:'+s.c:''}">${s.v}</div><div class="td-stat-lbl">${s.l}</div></div>`).join('')}
+        </div>
+      </div>
+    </div>
+
+    <div class="sect-title">Roster</div>
+    <div class="roster-grid">
+      ${roster.map(r=>`<div class="roster-card"><div class="roster-name">${r.name}</div><div class="${r.cls}">${r.role}</div></div>`).join('')}
+    </div>
+
+    <div class="sect-title">Player Stats — Season</div>
+    <div class="card" style="margin-bottom:24px"><div class="scroll-x"><table>
+      <thead><tr><th>Player</th><th>GP</th><th>PPG</th><th>RPG</th><th>APG</th><th>SPG</th><th>BPG</th><th>TOPG</th><th>FG%</th><th>3P%</th><th>FT%</th><th>TS%</th></tr></thead>
+      <tbody>${players.map(p=>`<tr>
+        <td class="name">${T(p.player)}${p.type==='Sub'?'<span style="font-size:10px;color:var(--blue);margin-left:6px">SUB</span>':''}</td>
+        <td>${p.gp}</td><td>${f1(p.ppg)}</td><td>${f1(p.rpg)}</td><td>${f1(p.apg)}</td>
+        <td>${f1(p.spg)}</td><td>${f1(p.bpg)}</td><td>${f1(p.topg)}</td>
+        <td>${pct(p.fgPct)}</td><td>${pct(p.threePct)}</td><td>${pct(p.ftPct)}</td><td>${pct(p.tsPct)}</td>
+      </tr>`).join('')}
+      ${gp>0?`<tr class="tot-row">
+        <td class="name">TEAM AVG</td><td>${gp}</td>
+        <td>${f1(tot.pts/gp)}</td><td>${f1(tot.reb/gp)}</td><td>${f1(tot.ast/gp)}</td>
+        <td>${f1(tot.stl/gp)}</td><td>${f1(tot.blk/gp)}</td><td>${f1(tot.tov/gp)}</td>
+        <td colspan="4" style="color:var(--text-muted);font-style:italic;font-family:var(--font-body)">See individual %s above</td>
+      </tr>`:''}
+      </tbody>
+    </table></div></div>
+
+    <div class="sect-title">Schedule</div>
+    <div class="card"><div class="scroll-x"><table>
+      <thead><tr><th>Date</th><th>Opponent</th><th>Result</th><th>Score</th><th>Type</th><th></th></tr></thead>
+      <tbody>${games.map(g=>{
+        const isA=g.teamA===teamName, opp=isA?g.teamB:g.teamA;
+        const tf=isA?g.scoreA:g.scoreB, ta=isA?g.scoreB:g.scoreA;
+        const win=g.played&&g.winner===teamName, loss=g.played&&g.loser===teamName;
+        const rc=win?'var(--green)':loss?'var(--red)':'var(--text-muted)';
+        const stream=streamForGame(g.gameTab,g.gameType);
+        const watchBtn=stream?`<a class="btn btn-watch btn-sm" href="https://www.youtube.com/watch?v=${stream.id}" target="_blank" rel="noopener">▶</a>`:'';
+        return `<tr>
+          <td>${fmtDate(g.date)}</td>
+          <td class="name">${T(opp)}</td>
+          <td style="color:${rc};font-weight:700;font-family:var(--font-body)">${g.played?(win?'W':loss?'L':'–'):'TBD'}</td>
+          <td>${g.played?`${tf}–${ta}${g.ot?' ('+g.ot+')':''}`:'–'}</td>
+          <td style="color:var(--text-muted)">${g.gameType}</td>
+          <td>${watchBtn}</td>
+        </tr>`;
+      }).join('')}</tbody>
+    </table></div></div>`;
+}
+
+// ============================================================
+//  BRACKET
+// ============================================================
+function renderBracket() {
+  const champEl = document.getElementById('champBanner');
+  const el = document.getElementById('bracketContent');
+  if (!_data||!_data.bracket) { el.innerHTML='<div class="empty">No data</div>'; return; }
+  const {seeds,results} = _data.bracket;
+  const seed  = n => seeds.find(s=>s.seed===n)||{seed:n,team:'TBD'};
+  const getSeed = name => { const s=seeds.find(x=>x.team===name); return s?s.seed:null; };
+  const res   = t => results[t]||{teamA:'TBD',teamB:'TBD',scoreA:null,scoreB:null,winner:'',played:false};
+  const qf1=res('QF1'),qf2=res('QF2'),sf1=res('SF1'),sf2=res('SF2'),fin=res('Final');
+  const qf1W=qf1.played?qf1.winner:'QF1 Winner';
+  const qf2W=qf2.played?qf2.winner:'QF2 Winner';
+  const sf1W=sf1.played?sf1.winner:'SF1 Winner';
+  const sf2W=sf2.played?sf2.winner:'SF2 Winner';
+  const champ=fin.played?fin.winner:'TBD';
+
+  // Champion banner
+  if (fin.played && champ !== 'TBD') {
+    champEl.innerHTML = `<div class="bracket-champ-banner">
+      <div class="champ-trophy">🏆</div>
+      <div class="champ-name" onclick="navigateTeams('${champ}')">${champ}</div>
+      <div class="champ-sub">2026 Backyard Summer Classic Champions</div>
+    </div>`;
+  } else { champEl.innerHTML = ''; }
+
+  const matchup = (tA, sA, tB, sB, result, streamKey) => {
+    const wA=result.played&&result.winner===tA, wB=result.played&&result.winner===tB;
+    const stream = STREAMS.find(s=>s.key===streamKey);
+    const watchUrl = stream ? `https://www.youtube.com/watch?v=${stream.id}` : null;
+    const bs = result.played ? (_data.boxScores||{})[Object.keys(_data.boxScores||{}).find(k=>{
+      const g=(_data.schedule||[]).find(x=>x.gameTab===k);
+      return g&&g.teamA===tA&&g.teamB===tB&&g.played;
+    })||''] : null;
+    const teamRow = (name, seedNum, win) => {
+      const sd = seedNum || getSeed(name);
+      return `<div class="b-team${win?' winner':''}">
+        <div class="b-team-info">
+          <div class="b-logo">${initials(name)}</div>
+          ${sd?`<span class="b-seed">${sd}</span>`:''}
+          <span class="b-name ${name!=='TBD'?'tlink':''}" ${name!=='TBD'?`onclick="navigateTeams('${name}')"`:''}>${name||'TBD'}</span>
+        </div>
+        ${result.played?`<span class="b-score">${win?'<b>'+(result.winner===name?(result.teamA===name?result.scoreA:result.scoreB):0)+'</b>':(result.teamA===name?result.scoreA:result.scoreB)}</span>`:`<span class="b-tbd">—</span>`}
+      </div>`;
+    };
+    const foot = [];
+    if (watchUrl) foot.push(`<a class="btn btn-watch btn-sm" href="${watchUrl}" target="_blank" rel="noopener">▶ Watch</a>`);
+    if (result.played) {
+      // Find the game tab for this matchup to link box score
+      const gameTab = ((_data.schedule||[]).find(g=>
+        g.played && ((g.teamA===tA&&g.teamB===tB)||(g.teamA===tB&&g.teamB===tA))
+      )||{}).gameTab;
+      if (gameTab) foot.push(`<button class="btn btn-outline btn-sm" onclick="openBoxScoreFromTile('${gameTab}')">Box Score</button>`);
+    }
+    return `<div class="b-match${!result.played?' upcoming':''}">
+      ${teamRow(tA,sA,wA)}
+      ${teamRow(tB,sB,wB)}
+      ${foot.length?`<div class="b-match-foot">${foot.join('')}</div>`:''}
+    </div>`;
+  };
+
+  el.innerHTML = `<div class="bracket-layout">
+    <div class="bc">
+      <div class="bc-hdr">Quarterfinals</div>
+      <div class="b-round">
+        ${matchup(seed(3).team,3,seed(6).team,6,qf1,'quarters')}
+        <div style="height:20px"></div>
+        ${matchup(seed(4).team,4,seed(5).team,5,qf2,'quarters')}
+      </div>
+    </div>
+    <div class="bc">
+      <div class="bc-hdr">Semifinals</div>
+      <div class="b-round">
+        ${matchup(seed(2).team,2,qf1W,null,sf2,'champ')}
+        ${matchup(seed(1).team,1,qf2W,null,sf1,'champ')}
+      </div>
+    </div>
+    <div class="bc">
+      <div class="bc-hdr">Final</div>
+      <div class="b-round" style="justify-content:center">
+        ${matchup(sf2W,null,sf1W,null,fin,'champ')}
+      </div>
+    </div>
+    <div class="bc" style="flex:0 0 150px">
+      <div class="bc-hdr">Champion</div>
+      <div class="champ-slot">
+        <div class="champ-card-inner">
+          <div class="cc-trophy">🏆</div>
+          <div class="cc-lbl">Champion</div>
+          <div class="cc-name ${champ!=='TBD'?'tlink':''}" ${champ!=='TBD'?`onclick="navigateTeams('${champ}')"`:''}>${champ}</div>
+          ${champ!=='TBD'?`<div class="cc-year">2026 Backyard Summer Classic</div>`:''}
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ============================================================
+//  HIGHS
+// ============================================================
+document.querySelectorAll('.hptab').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.hptab').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    _higgsPhase = btn.dataset.phase;
+    renderHighsCategory();
+  });
+});
+document.getElementById('highsCatSel').addEventListener('change',e=>renderHighsCategory(e.target.value));
+
+function renderHighs() {
+  if (!_data||!_data.tournamentHighs) return;
+  const sel = document.getElementById('highsCatSel');
+  sel.innerHTML = Object.keys(_data.tournamentHighs.regular||{}).map(c=>`<option value="${c}">${c}</option>`).join('');
+  renderHighsCategory(sel.value);
+}
+
+function renderHighsCategory(cat) {
+  if (!_data||!_data.tournamentHighs) return;
+  const phase = document.querySelector('.hptab.active')?.dataset.phase || _higgsPhase;
+  const category = cat || document.getElementById('highsCatSel').value;
+  const entries  = (_data.tournamentHighs[phase]||{})[category]||[];
+  const el = document.getElementById('highsList');
+  if (!entries.length) { el.innerHTML='<div class="empty">No results yet</div>'; return; }
+  el.innerHTML = entries.map(e=>{
+    const gameTab = findGameTabForPerf(e.team, e.opponent, e.date);
+    const bsBtn   = gameTab ? `<button class="btn btn-outline btn-sm" style="margin-left:auto" onclick="openBoxScoreFromTile('${gameTab}')">Box Score</button>` : '';
+    return `<div class="h-row ${e.rank===1?'r1':''}">
+      <div class="h-rank ${e.rank===1?'gold':''}">${e.rank}</div>
+      <div class="h-val">${e.value}</div>
+      <div class="h-info" style="flex:1">
+        <div class="h-player">${T(e.player)} <span style="font-size:12px;font-weight:400;color:var(--text-dim)">${e.team}</span></div>
+        <div class="h-meta">vs ${T(e.opponent)} · ${e.date}</div>
+      </div>
+      ${bsBtn}
+    </div>`;
+  }).join('');
+}
+
+// ============================================================
+//  INIT
+// ============================================================
+fetchData();
+setInterval(fetchData, 60_000);
+</script>
+</body>
+</html>
