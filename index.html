@@ -387,7 +387,7 @@ td.tlink-cell{font-family:var(--font-body);font-weight:600;}
 <nav>
   <div class="nav-logo">
     <!-- Swap div for <img src="logos/league.png" alt="BSC"> when logo is ready -->
-    <div class="nav-logo-ph">BSC</div>
+    <img class="nav-logo-img" src="league.png" alt="BSC" onerror="this.outerHTML='<div class=&quot;nav-logo-ph&quot;>BSC</div>'">
     <span class="nav-name">Backyard Classics</span>
   </div>
   <div class="nav-links">
@@ -733,15 +733,37 @@ function initials(name) {
   if (!name) return '?';
   return name.split(/\s+/).map(w=>w[0]).join('').slice(0,3).toUpperCase();
 }
+// Map team names to logo filenames (files live at repo root)
+function logoFile(name) {
+  if (!name) return null;
+  const map = {
+    'Downpour':'downpour.png',
+    'Fowl':'fowl.png',
+    'Lightshow':'lightshow.png',
+    'Los Diablos':'los-diablos.png',
+    'Rooks':'rooks.png',
+    'Slashers':'slashers.png',
+  };
+  return map[name] || null;
+}
+// Returns just the inner content of a logo circle: an <img> if a logo file
+// exists for this team, otherwise the initials text. The <img> falls back to
+// initials automatically if the file fails to load.
+function logoInner(name) {
+  const f = logoFile(name);
+  if (!f) return initials(name);
+  const safe = (name||'').replace(/"/g,'');
+  return `<img src="${f}" alt="${safe}" onerror="this.replaceWith(document.createTextNode('${initials(name)}'))">`;
+}
 // Wrap team name in a clickable span
 const T = (name, cls='') => {
   if (!name || name==='TBD') return `<span>${name||'TBD'}</span>`;
   const safe = name.replace(/'/g,"\\'");
   return `<span class="tlink${cls?' '+cls:''}" onclick="navigateTeams('${safe}')">${name}</span>`;
 };
-// Team logo placeholder (swap for <img> when logos ready)
+// Team logo circle — shows image if available, else initials
 const logoDiv = (name, size=28, cls='') =>
-  `<div class="${cls||'standings-logo'}" style="width:${size}px;height:${size}px;font-size:${Math.round(size*0.32)}px">${initials(name)}</div>`;
+  `<div class="${cls||'standings-logo'}" style="width:${size}px;height:${size}px;font-size:${Math.round(size*0.32)}px">${logoInner(name)}</div>`;
 
 const streamForGame = (gameTab, gameType) =>
   STREAMS.find(s=>s.games.includes(gameTab)) ||
@@ -771,7 +793,7 @@ function populateTeamDropdown() {
   (_data.teams||[]).forEach(t=>{
     const btn = document.createElement('button');
     btn.className = 'nav-dd-item team-entry';
-    btn.innerHTML = `<div class="nav-dd-logo-ph">${initials(t.name)}</div>${t.name}`;
+    btn.innerHTML = `<div class="nav-dd-logo-ph">${logoInner(t.name)}</div>${t.name}`;
     btn.onclick = () => navigateTeams(t.name);
     dd.appendChild(btn);
   });
@@ -794,13 +816,13 @@ function renderGameNav() {
     const s = streamForGame(g.gameTab, g.gameType);
     const watchBtn = s ? `<a class="btn btn-watch btn-sm" href="https://www.youtube.com/watch?v=${s.id}" target="_blank" rel="noopener">▶ Watch</a>` : '';
     return `<div class="gnav-chip">
-      <div class="gnav-chip-logo">${initials(g.teamA)}</div>
+      <div class="gnav-chip-logo">${logoInner(g.teamA)}</div>
       <div class="gnav-info">
         <div class="gnav-teams">${g.teamA} vs ${g.teamB}</div>
         <div class="gnav-meta">${fmtDate(g.date)} · ${g.time} · ${g.gameType}</div>
       </div>
       <div class="gnav-vs">${watchBtn}</div>
-      <div class="gnav-chip-logo">${initials(g.teamB)}</div>
+      <div class="gnav-chip-logo">${logoInner(g.teamB)}</div>
     </div>`;
   }).join('');
   dotsEl.innerHTML = _gnavItems.map((_,i)=>`<div class="gnav-dot${i===0?' active':''}"></div>`).join('');
@@ -876,7 +898,7 @@ function renderTiles() {
       </div>
       <div class="tile-matchup">
         <div class="tile-team">
-          <div class="tile-logo">${initials(g.teamA)}</div>
+          <div class="tile-logo">${logoInner(g.teamA)}</div>
           <div class="tile-team-name ${wA?'':'loser'}" onclick="navigateTeams('${g.teamA}')">${g.teamA}</div>
           <div class="tile-team-record">${g.played&&wA?'<b>W</b> · ':''}${recordOf(g.teamA)}</div>
         </div>
@@ -885,7 +907,7 @@ function renderTiles() {
           <div class="tile-status ${statusCls}" style="margin-top:4px">${statusText}</div>
         </div>
         <div class="tile-team">
-          <div class="tile-logo">${initials(g.teamB)}</div>
+          <div class="tile-logo">${logoInner(g.teamB)}</div>
           <div class="tile-team-name ${wB?'':'loser'}" onclick="navigateTeams('${g.teamB}')">${g.teamB}</div>
           <div class="tile-team-record">${g.played&&wB?'<b>W</b> · ':''}${recordOf(g.teamB)}</div>
         </div>
@@ -1042,7 +1064,7 @@ function renderSchedule() {
       <div class="yg-body">
         <div class="yg-team" style="text-align:left">
           <div class="yg-team-row">
-            <div class="yg-logo">${initials(g.teamA)}</div>
+            <div class="yg-logo">${logoInner(g.teamA)}</div>
             ${T(g.teamA,'yg-team-name '+(g.played?(wA?'winner':'loser'):''))}
           </div>
           <div class="yg-record">${teamSubtitle(g.teamA,wA)}</div>
@@ -1055,7 +1077,7 @@ function renderSchedule() {
         </div>
         <div class="yg-team" style="text-align:right">
           <div class="yg-team-row" style="flex-direction:row-reverse">
-            <div class="yg-logo">${initials(g.teamB)}</div>
+            <div class="yg-logo">${logoInner(g.teamB)}</div>
             ${T(g.teamB,'yg-team-name '+(g.played?(wB?'winner':'loser'):''))}
           </div>
           <div class="yg-record">${teamSubtitle(g.teamB,wB)}</div>
@@ -1274,7 +1296,7 @@ function renderTeamsHome(el) {
     const gp=(s.w||0)+(s.l||0);
     return `<div class="team-card" onclick="navigateTeams('${t.name}')">
       <div class="team-card-head">
-        <div class="tc-logo">${initials(t.name)}</div>
+        <div class="tc-logo">${logoInner(t.name)}</div>
         <div>
           <div class="tc-name">${t.name}</div>
           <div class="tc-record">${s.w||0}–${s.l||0}${gp?` · ${((s.w||0)/gp*100).toFixed(0)}%`:''}</div>
@@ -1312,7 +1334,7 @@ function renderTeamDetail(el, teamName) {
   el.innerHTML = `
     <button class="btn btn-ghost" style="margin-bottom:16px" onclick="navigateTeams('home')">← All Teams</button>
     <div class="td-hdr">
-      <div class="td-logo">${initials(teamName)}</div>
+      <div class="td-logo">${logoInner(teamName)}</div>
       <div>
         <div class="td-name">${teamName}</div>
         <div class="td-meta">
@@ -1406,7 +1428,7 @@ function renderBracket() {
       const sd = seedNum || getSeed(name);
       return `<div class="b-team${win?' winner':''}">
         <div class="b-team-info">
-          <div class="b-logo">${initials(name)}</div>
+          <div class="b-logo">${logoInner(name)}</div>
           ${sd?`<span class="b-seed">${sd}</span>`:''}
           <span class="b-name ${name!=='TBD'?'tlink':''}" ${name!=='TBD'?`onclick="navigateTeams('${name}')"`:''}>${name||'TBD'}</span>
         </div>
