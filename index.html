@@ -842,16 +842,30 @@ function toggleSchedBox(tab,btn){
 
 // ---------- BOX SCORE builder ----------
 function buildBoxScore(g,bs){
+  // Build "makes/attempts" from the separate fields the API sends.
+  const ma=(m,a)=>`${m||0}/${a||0}`;
+  const fgLine=p=>{
+    // Total FG = 2PT + 3PT makes/attempts
+    const fgm=(p.twoPM||0)+(p.threePM||0);
+    const fga=(p.twoPA||0)+(p.threePA||0);
+    return ma(fgm,fga);
+  };
   const side=(players,name,score)=>{
     const rows=(players||[]).map(p=>`<tr>
       <td style="font-weight:600;white-space:nowrap">${p.player||p.p||''}</td>
       <td class="mono" style="font-weight:700;color:var(--accent)">${p.pts??0}</td>
-      <td class="mono">${p.reb??0}</td><td class="mono">${p.ast??0}</td>
+      <td class="mono">${p.reb??0}</td>
+      <td class="mono" style="color:var(--muted)">${p.oreb??0}</td>
+      <td class="mono" style="color:var(--muted)">${p.dreb??0}</td>
+      <td class="mono">${p.ast??0}</td>
       <td class="mono">${p.stl??0}</td><td class="mono">${p.blk??0}</td><td class="mono">${p.tov??0}</td>
-      <td class="mono" style="color:var(--muted)">${p.fg||''}</td><td class="mono" style="color:var(--muted)">${p.threes||p['3pt']||''}</td><td class="mono" style="color:var(--muted)">${p.ft||''}</td>
+      <td class="mono" style="color:var(--muted)">${fgLine(p)}</td>
+      <td class="mono" style="color:var(--muted)">${ma(p.twoPM,p.twoPA)}</td>
+      <td class="mono" style="color:var(--muted)">${ma(p.threePM,p.threePA)}</td>
+      <td class="mono" style="color:var(--muted)">${ma(p.ftm,p.fta)}</td>
     </tr>`).join('');
     return `<div class="box-side"><h4><span>${name}</span>${score!=null?`<span class="mono" style="font-size:18px;color:var(--accent)">${score}</span>`:''}</h4>
-      <div class="scroll-x"><table><thead><tr><th>Player</th><th>PTS</th><th>REB</th><th>AST</th><th>STL</th><th>BLK</th><th>TOV</th><th>FG</th><th>3PT</th><th>FT</th></tr></thead><tbody>${rows}</tbody></table></div></div>`;
+      <div class="scroll-x"><table><thead><tr><th>Player</th><th>PTS</th><th>REB</th><th>OR</th><th>DR</th><th>AST</th><th>STL</th><th>BLK</th><th>TOV</th><th>FG</th><th>2PT</th><th>3PT</th><th>FT</th></tr></thead><tbody>${rows}</tbody></table></div></div>`;
   };
   const A=bs.A||bs.away&&bs.away.players||[], B=bs.B||bs.home&&bs.home.players||[];
   return `<div class="box-inner">${side(A,g.teamA,g.scoreA)}${side(B,g.teamB,g.scoreB)}</div>`;
@@ -870,7 +884,24 @@ function renderRoleFilter(){
   const el=document.getElementById('roleFilter');
   el.innerHTML=ROLES.map(r=>`<button class="pill${_roleFilter===r?' active':''}" onclick="setRoleFilter('${r}')">${r}</button>`).join('');
 }
+function normalizeRole(type){
+  const t=String(type||'').toLowerCase();
+  if(!t) return '';
+  if(t.indexOf('captain')>=0) return 'Captain';
+  if(t.indexOf('1st')>=0||t.indexOf('first')>=0) return '1st Round Pick';
+  if(t.indexOf('2nd')>=0||t.indexOf('second')>=0) return '2nd Round Pick';
+  if(t.indexOf('3rd')>=0||t.indexOf('third')>=0) return '3rd Round Pick';
+  if(t.indexOf('sub')>=0) return 'Sub';
+  return ''; // "core" or unknown -> let caller fall back
+}
 function getPlayerRole(name){
+  // 1) Prefer the Type column carried on the stats rows (source of truth).
+  for(const tab of ['total','regular','playoff']){
+    const arr=(_data.stats&&_data.stats[tab])||[];
+    const hit=arr.find(p=>p.player===name);
+    if(hit){ const r=normalizeRole(hit.type); if(r) return r; }
+  }
+  // 2) Fall back to the team roster structure.
   for(const t of (_data.teams||[])){
     if(t.captain===name) return 'Captain';
     if(t.round1===name) return '1st Round Pick';
@@ -889,8 +920,8 @@ function computeTeamFull(name){
     const side=g.teamA===name?(bs.A||(bs.away&&bs.away.players)||[]):(bs.B||(bs.home&&bs.home.players)||[]);
     side.forEach(p=>{
       t.pts+=p.pts||0;t.reb+=p.reb||0;t.ast+=p.ast||0;t.stl+=p.stl||0;t.blk+=p.blk||0;t.tov+=p.tov||0;
-      const fg=parseMA(p.fg),tp=parseMA(p.threes||p['3pt']),ft=parseMA(p.ft);
-      t.fgm+=fg.m;t.fga+=fg.a;t.tpm+=tp.m;t.tpa+=tp.a;t.ftm+=ft.m;t.fta+=ft.a;t.twom+=(fg.m-tp.m);t.twoa+=(fg.a-tp.a);
+      const twom=p.twoPM||0, twoa=p.twoPA||0, tpm=p.threePM||0, tpa=p.threePA||0, ftm=p.ftm||0, fta=p.fta||0;
+      t.fgm+=(twom+tpm);t.fga+=(twoa+tpa);t.tpm+=tpm;t.tpa+=tpa;t.ftm+=ftm;t.fta+=fta;t.twom+=twom;t.twoa+=twoa;
     });
   });
   const gp=t.gp||1, pctf=(m,a)=>a>0?m/a*100:0;
@@ -959,25 +990,40 @@ function renderStats(){
 
   // player tabs
   renderRoleFilter();
-  note.textContent=_statTab==='total'?'Combined regular season + playoff stats. Click any column to sort.':_statTab==='regular'?'Regular season games only.':'Playoff games only.';
-  const cols=[['rank','#'],['player','Player'],['team','Team'],['role','Role'],['gp','GP'],['ppg','PPG'],['rpg','RPG'],['apg','APG'],['spg','SPG'],['fgPct','FG%']];
+  note.textContent=_statTab==='total'?'Combined regular season + playoff stats. Click any column to sort. Scroll sideways for more \u2192':_statTab==='regular'?'Regular season games only. Scroll sideways for more \u2192':'Playoff games only. Scroll sideways for more \u2192';
+  // Full stat set matching the spreadsheet. fmt: 1=one decimal, p=percent, i=integer, s=string
+  const cols=[
+    ['rank','#','r'],['player','Player','s'],['team','Team','s'],['role','Role','role'],
+    ['gp','GP','i'],['ppg','PPG','1'],['rpg','RPG','1'],['orpg','ORPG','1'],['drpg','DRPG','1'],
+    ['apg','APG','1'],['spg','SPG','1'],['bpg','BPG','1'],['topg','TOPG','1'],
+    ['fgPct','FG%','p'],['twoPct','2P%','p'],['threePct','3P%','p'],['ftPct','FT%','p'],
+    ['fgPerGame','FG/G','1'],['threePtPerGame','3PT/G','1'],['ftPerGame','FT/G','1'],
+    ['efgPct','eFG%','p'],['tsPct','TS%','p']
+  ];
   let rows=[...(_data.stats[_statTab]||[])];
   if(_roleFilter!=='All') rows=rows.filter(p=>getPlayerRole(p.player)===_roleFilter);
   if(_pSort.col!=='rank'){
-    const val=p=>{const c=_pSort.col; if(c==='player')return p.player; if(c==='team')return p.team; if(c==='role')return getPlayerRole(p.player); if(c==='fgPct')return p.fgPct; return p[c];};
+    const val=p=>{const c=_pSort.col; if(c==='player')return p.player; if(c==='team')return p.team; if(c==='role')return getPlayerRole(p.player); return p[c];};
     rows.sort((a,b)=>{const va=val(a),vb=val(b); if(typeof va==='string')return _pSort.dir*String(va).localeCompare(String(vb)); return _pSort.dir*((va||0)-(vb||0));});
   }
+  const fmtCell=(p,key,f)=>{
+    if(f==='s'||f==='role') return '';
+    if(f==='r') return '';
+    if(f==='i') return p[key]??0;
+    if(f==='p') return pct(p[key]);
+    return f1(p[key]);
+  };
   const head=cols.map(([c,l])=>`<th class="sortable${_pSort.col===c?' sorted':''}" onclick="sortP('${c}')">${l}${_pSort.col===c?(_pSort.dir===-1?' \u25bc':' \u25b2'):''}</th>`).join('');
-  const body=rows.map((p,i)=>`<tr>
-    <td class="mono" style="color:#aaa">${i+1}</td>
-    <td class="name tlink" onclick="navigateTeams('${esc(p.team)}')">${p.player}</td>
-    <td class="tlink" style="color:var(--dim)" onclick="navigateTeams('${esc(p.team)}')">${p.team}</td>
-    <td style="font-size:10px;color:var(--muted)">${getPlayerRole(p.player)}</td>
-    <td class="mono">${p.gp}</td>
-    <td class="mono" style="font-weight:700;color:var(--accent)">${f1(p.ppg)}</td>
-    <td class="mono">${f1(p.rpg)}</td><td class="mono">${f1(p.apg)}</td><td class="mono">${f1(p.spg)}</td>
-    <td class="mono">${pct(p.fgPct)}</td>
-  </tr>`).join('');
+  const body=rows.map((p,i)=>{
+    return '<tr>'+cols.map(([c,l,f])=>{
+      if(c==='rank') return `<td class="mono" style="color:#aaa">${i+1}</td>`;
+      if(c==='player') return `<td class="name tlink" onclick="navigateTeams('${esc(p.team)}')" style="white-space:nowrap">${p.player}</td>`;
+      if(c==='team') return `<td class="tlink" style="color:var(--dim);white-space:nowrap" onclick="navigateTeams('${esc(p.team)}')">${p.team}</td>`;
+      if(c==='role') return `<td style="font-size:10px;color:var(--muted);white-space:nowrap">${getPlayerRole(p.player)}</td>`;
+      const style = c==='ppg' ? 'font-weight:700;color:var(--accent)' : '';
+      return `<td class="mono" style="${style}">${fmtCell(p,c,f)}</td>`;
+    }).join('')+'</tr>';
+  }).join('');
   table.innerHTML=`<thead><tr>${head}</tr></thead><tbody>${body}</tbody>`;
 }
 function renderBoxPane(){
@@ -1057,7 +1103,8 @@ function renderTeamDetail(el,name){
   if(t.round1) roster.push({n:t.round1,r:'1st Round Pick',c:'var(--accent)'});
   if(t.round2) roster.push({n:t.round2,r:'2nd Round Pick',c:'var(--accent)'});
   if(t.round3) roster.push({n:t.round3,r:'3rd Round Pick',c:'var(--accent)'});
-  if(t.sub) roster.push({n:t.sub,r:'Sub',c:'var(--blue)'});
+  const subs = (t.subs&&t.subs.length)?t.subs:(t.sub?[t.sub]:[]);
+  subs.forEach(s=>roster.push({n:s,r:'Sub',c:'var(--blue)'}));
   const games=(_data.schedule||[]).filter(g=>g.teamA===name||g.teamB===name);
   const diff=b.diff;
   el.innerHTML=`
@@ -1083,9 +1130,9 @@ function renderTeamDetail(el,name){
     </div>
     <div class="sect-lbl">Player Stats</div>
     <div class="card scroll-x" style="margin-bottom:22px"><table>
-      <thead><tr><th>Player</th><th>GP</th><th>PPG</th><th>RPG</th><th>APG</th><th>SPG</th><th>BPG</th><th>TOPG</th><th>FG%</th></tr></thead>
-      <tbody>${players.map(p=>`<tr><td class="name">${p.player}</td><td class="mono">${p.gp}</td><td class="mono" style="font-weight:700;color:var(--accent)">${f1(p.ppg)}</td><td class="mono">${f1(p.rpg)}</td><td class="mono">${f1(p.apg)}</td><td class="mono">${f1(p.spg)}</td><td class="mono">${f1(p.bpg)}</td><td class="mono">${f1(p.topg)}</td><td class="mono">${pct(p.fgPct)}</td></tr>`).join('')}
-      ${tf.gp>0?`<tr class="tot-row"><td class="name">TEAM TOTAL</td><td class="mono">${tf.gp}</td><td class="mono" style="color:var(--accent)">${f1(tf.ppg)}</td><td class="mono">${f1(tf.rpg)}</td><td class="mono">${f1(tf.apg)}</td><td class="mono">${f1(tf.spg)}</td><td class="mono">${f1(tf.bpg)}</td><td class="mono">${f1(tf.topg)}</td><td class="mono">${f1(tf.fgPct)}%</td></tr>`:''}
+      <thead><tr><th>Player</th><th>Role</th><th>GP</th><th>PPG</th><th>RPG</th><th>ORPG</th><th>DRPG</th><th>APG</th><th>SPG</th><th>BPG</th><th>TOPG</th><th>FG%</th><th>2P%</th><th>3P%</th><th>FT%</th><th>eFG%</th><th>TS%</th></tr></thead>
+      <tbody>${players.map(p=>`<tr><td class="name" style="white-space:nowrap">${p.player}</td><td style="font-size:10px;color:var(--muted);white-space:nowrap">${getPlayerRole(p.player)}</td><td class="mono">${p.gp}</td><td class="mono" style="font-weight:700;color:var(--accent)">${f1(p.ppg)}</td><td class="mono">${f1(p.rpg)}</td><td class="mono">${f1(p.orpg)}</td><td class="mono">${f1(p.drpg)}</td><td class="mono">${f1(p.apg)}</td><td class="mono">${f1(p.spg)}</td><td class="mono">${f1(p.bpg)}</td><td class="mono">${f1(p.topg)}</td><td class="mono">${pct(p.fgPct)}</td><td class="mono">${pct(p.twoPct)}</td><td class="mono">${pct(p.threePct)}</td><td class="mono">${pct(p.ftPct)}</td><td class="mono">${pct(p.efgPct)}</td><td class="mono">${pct(p.tsPct)}</td></tr>`).join('')}
+      ${tf.gp>0?`<tr class="tot-row"><td class="name">TEAM TOTAL</td><td></td><td class="mono">${tf.gp}</td><td class="mono" style="color:var(--accent)">${f1(tf.ppg)}</td><td class="mono">${f1(tf.rpg)}</td><td class="mono">\u2014</td><td class="mono">\u2014</td><td class="mono">${f1(tf.apg)}</td><td class="mono">${f1(tf.spg)}</td><td class="mono">${f1(tf.bpg)}</td><td class="mono">${f1(tf.topg)}</td><td class="mono">${f1(tf.fgPct)}%</td><td class="mono">${f1(tf.twoPct)}%</td><td class="mono">${f1(tf.tpPct)}%</td><td class="mono">${f1(tf.ftPct)}%</td><td class="mono">${f1(tf.efgPct)}%</td><td class="mono">${f1(tf.tsPct)}%</td></tr>`:''}
       </tbody></table></div>
     <div class="sect-lbl">Schedule</div>
     <div class="card">${games.map(g=>{
