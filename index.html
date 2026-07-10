@@ -86,6 +86,14 @@ nav{background:var(--nav);display:flex;align-items:center;padding:0 12px;height:
 .btn-ghost{border:none;background:none;color:var(--muted);font-size:12px;padding:3px 8px;}
 .card{background:#fff;border:1.5px solid var(--border);border-radius:8px;overflow:hidden;}
 .scroll-x{overflow-x:auto;}
+/* Freeze the # and Player columns on the stats table when scrolling sideways */
+.freeze-name table{border-collapse:separate;border-spacing:0;}
+.freeze-name th,.freeze-name td{border-collapse:separate;}
+.freeze-name th:nth-child(1),.freeze-name td:nth-child(1){position:sticky;left:0;z-index:3;background:#fff;width:34px;min-width:34px;max-width:34px;padding-left:8px;padding-right:6px;text-align:center;}
+.freeze-name th:nth-child(2),.freeze-name td:nth-child(2){position:sticky;z-index:3;background:#fff;box-shadow:2px 0 0 rgba(0,0,0,.06);}
+.freeze-name thead th:nth-child(1),.freeze-name thead th:nth-child(2){z-index:4;background:#f5f5f5;}
+/* left offset for the 2nd sticky column = width of the 1st (#) column */
+.freeze-name th:nth-child(2),.freeze-name td:nth-child(2){left:34px;}
 .section-title{font-family:var(--font-display);font-size:18px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px;}
 .stats-note{font-size:12px;color:var(--muted);margin-bottom:12px;}
 .tlink{cursor:pointer;}
@@ -430,7 +438,7 @@ td.name,td .name{font-weight:700;}
       </div>
     </div>
     <p class="stats-note" id="statsNote">Click any column header to sort.</p>
-    <div class="card scroll-x" id="statsCard"><table id="statsTable"></table></div>
+    <div class="card scroll-x freeze-name" id="statsCard"><table id="statsTable"></table></div>
     <div id="boxScoresPane" style="display:none;"></div>
   </div>
 </div>
@@ -661,7 +669,7 @@ function populateTeamDropdown(){
   const el=document.getElementById('teamDropdownInner');
   const teams=_data.teams||[];
   el.innerHTML=`<button class="nav-dd-item all" onclick="navigateTeams('home')">All Teams</button>`+
-    teams.map(t=>`<button class="nav-dd-item" onclick="navigateTeams('${esc(t.name)}')"><span class="nav-dd-logo-ph">${initials(t.name)}</span>${t.name}</button>`).join('');
+    teams.map(t=>`<button class="nav-dd-item" onclick="navigateTeams('${esc(t.name)}')">${t.name}</button>`).join('');
 }
 
 // ---------- standings helpers ----------
@@ -1001,7 +1009,13 @@ function renderStats(){
     ['efgPct','eFG%','p'],['tsPct','TS%','p']
   ];
   let rows=[...(_data.stats[_statTab]||[])];
-  if(_roleFilter!=='All') rows=rows.filter(p=>getPlayerRole(p.player)===_roleFilter);
+  if(_roleFilter==='All'){
+    // Hide subs who've played fewer than 2 games from the combined leaderboard.
+    // They still show when the "Sub" role filter is selected.
+    rows=rows.filter(p=>!(getPlayerRole(p.player)==='Sub' && (p.gp||0)<2));
+  } else {
+    rows=rows.filter(p=>getPlayerRole(p.player)===_roleFilter);
+  }
   if(_pSort.col!=='rank'){
     const val=p=>{const c=_pSort.col; if(c==='player')return p.player; if(c==='team')return p.team; if(c==='role')return getPlayerRole(p.player); return p[c];};
     rows.sort((a,b)=>{const va=val(a),vb=val(b); if(typeof va==='string')return _pSort.dir*String(va).localeCompare(String(vb)); return _pSort.dir*((va||0)-(vb||0));});
